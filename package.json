@@ -1,0 +1,24 @@
+{
+  "name": "agency-finance-backend",
+  "version": "1.0.0",
+  "description": "Multi-tenant agency finance backend (Node.js, Express, MongoDB, JWT)",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "seed:superadmin": "node scripts/seedSuperAdmin.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.18",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.2.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.3",
+    "morgan": "^1.10.0"
+  }
+}
