@@ -106,3 +106,43 @@ export async function byServiceType(req, res, next) {
     res.json(results);
   } catch (err) { next(err); }
 }
+
+// GET /api/reports/trend?group=day&range=7d
+export async function trend(req, res, next) {
+  try {
+    const { group = "day", range = "7d" } = req.query;
+
+    // Calculate date range
+    const end = new Date();
+    let start;
+    if (range.endsWith("d")) {
+      const days = parseInt(range);
+      start = new Date();
+      start.setDate(end.getDate() - days + 1);
+    } else {
+      start = new Date(end.getFullYear(), 0, 1); // fallback: this year
+    }
+
+    const pipeline = [
+      { $match: { createdAt: { $gte: start, $lte: end } } },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: group === "day" ? "%Y-%m-%d" : "%Y-%m",
+              date: "$createdAt",
+            },
+          },
+          profit: { $sum: { $subtract: ["$commission", "$expenses"] } },
+        },
+      },
+      { $project: { period: "$_id", profit: 1, _id: 0 } },
+      { $sort: { period: 1 } },
+    ];
+
+    const results = await Record.aggregate(pipeline);
+    res.json(results);
+  } catch (err) {
+    next(err);
+  }
+}
