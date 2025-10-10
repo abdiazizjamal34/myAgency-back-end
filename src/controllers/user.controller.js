@@ -7,7 +7,7 @@ export async function createUser(req, res, next) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-    const { name, email, password, role } = req.body;
+  const { name, email, phone, password, role } = req.body;
     let agencyId = req.user.agency;
     if (req.user.role === ROLES.SUPER_ADMIN && req.body.agency) {
       agencyId = req.body.agency;
@@ -22,7 +22,7 @@ export async function createUser(req, res, next) {
     if (role === ROLES.SUPER_ADMIN && req.user.role !== ROLES.SUPER_ADMIN) {
       return res.status(403).json({ message: 'Only SUPER_ADMIN can create SUPER_ADMIN' });
     }
-    const user = await User.create({ name, email, password, role: role || ROLES.PARTNER, agency: agencyId, createdBy: req.user._id });
+  const user = await User.create({ name, email, phone, password, role: role || ROLES.PARTNER, agency: agencyId, createdBy: req.user._id });
     const data = user.toObject(); delete data.password;
     res.status(201).json(data);
   } catch (err) { next(err); }

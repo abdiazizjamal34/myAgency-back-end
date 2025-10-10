@@ -4,6 +4,11 @@ import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import User from '../models/User.js';
 import { validationResult } from 'express-validator';
+// import crypto from "crypto";
+// import { sendOtpWhatsApp } from "../utils/whatsapp.js";
+import Otp from "../models/Otp.js";
+import crypto from "crypto";
+import { sendOtpWhatsApp } from '../utils/whatsapp.js';
 dotenv.config();
 
 function signToken(user) {
@@ -81,7 +86,7 @@ export async function changePassword(req, res, next) {
       if (!newPassword || newPassword.length < 6) return res.status(400).json({ message: 'newPassword is required and must be at least 6 characters' });
       const user = await User.findById(targetId);
       if (!user) return res.status(404).json({ message: 'User not found' });
-      user.password = await bcrypt.hash(newPassword, 10);
+        user.password = newPassword; // let pre-save hook hash it
       await user.save();
       return res.json({ message: 'Password updated successfully' });
     }
@@ -94,10 +99,124 @@ export async function changePassword(req, res, next) {
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Current password is incorrect' });
 
-    user.password = await bcrypt.hash(newPassword, 10);
+      user.password = newPassword; // let pre-save hook hash it
     await user.save();
     res.json({ message: 'Password updated successfully' });
   } catch (err) {
+    next(err);
+  }
+}
+
+
+
+// 1️⃣ Request OTP
+export async function requestOtp(req, res, next) {
+  try {
+    const { phone } = req.body;
+    const user = await User.findOne({ phone });
+    if (!user)
+      return res.status(404).json({ message: "No user found with this phone number" });
+
+    // generate 6-digit OTP
+    const code = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // save OTP
+    await Otp.create({
+      user: user._id,
+      code,
+      expiresAt
+    });
+
+    // send via WhatsApp
+    await sendOtpWhatsApp(phone, code);
+
+    // ✅ log info for debugging
+    console.log(
+      `OTP created: ${code} for ${user.email} expires at ${expiresAt.toISOString()}`
+    );
+
+    res.json({ message: "OTP sent via WhatsApp" });
+  } catch (err) {
+    console.error("requestOtp error:", err);
+    next(err);
+  }
+}
+
+
+// 2️⃣ Verify OTP
+export async function verifyOtp(req, res, next) {
+  try {
+    const { phone, code } = req.body;
+
+    // 1️⃣ Find user by phone
+    const user = await User.findOne({ phone });
+    if (!user) {
+      console.log("❌ No user found for phone:", phone);
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 2️⃣ Find matching OTP
+    const now = new Date();
+    const otpRecord = await Otp.findOne({
+      user: user._id,
+      code: String(code), // ensure both sides are strings
+      expiresAt: { $gte: now },
+      verified: false
+    });
+
+    if (!otpRecord) {
+      console.log("❌ Invalid or expired OTP", { phone, code, now });
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    // 3️⃣ Mark OTP as verified
+    otpRecord.verified = true;
+    await otpRecord.save();
+
+    console.log(`✅ OTP ${code} verified for ${user.email}`);
+
+    // 4️⃣ Respond with userId to use in reset-password
+    res.json({
+      message: "OTP verified successfully",
+      userId: user._id
+    });
+  } catch (err) {
+    console.error("verifyOtp error:", err);
+    next(err);
+  }
+}
+
+
+// 3️⃣ Reset password
+export async function resetPassword(req, res, next) {
+  try {
+    const { userId, newPassword } = req.body;
+
+    // Validate inputs
+    if (!userId || !newPassword) {
+      return res.status(400).json({ message: "userId and newPassword are required" });
+    }
+
+    // 1️⃣ Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 2️⃣ Update password
+    user.password = newPassword; // hashing handled by pre-save hook in User model
+    await user.save();
+
+    // 3️⃣ Clean up OTPs for this user
+    await Otp.deleteMany({ user: user._id });
+
+    console.log(`🔑 Password reset successful for ${user.email}`);
+
+    // 4️⃣ Respond
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error("resetPassword error:", err);
     next(err);
   }
 }

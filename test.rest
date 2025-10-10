@@ -1,19 +1,24 @@
-
- ####
+####
 
  POST  http://localhost:4000/api/auth/login
  Content-Type: application/json
 
- {
-    "email" : "superadmin@example.com",
-    "password" : "SuperStrongPassword123!"
- }
+#  {
+#     "email" : "superadmin@example.com",
+#     "password" : "SuperStrongPassword123!"
+#  }
 
 
 #  {
-#     "email" : "nurtrv002@example.com",
+#     "email" : "afro@example.com",
 #     "password" : "12345678"
 #  }
+
+{
+  "email": "john@example.com",
+  "password": "StrongPassword123"
+}
+
 
 ###
  POST  http://3.88.179.134/api/records
@@ -60,3 +65,88 @@ Content-Type: application/json
 GET http://localhost:4000/api/records?from=2025-07-01&to=2025-07-31
 Content-Type: application/json
   Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjA0MWYzYmU2NzZlMjhhNDQzNmQzOSIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOiI2OGIwMmZhMDY3YzE4ZDc2MTkzZTdiN2QiLCJpYXQiOjE3NTYzODE4NTUsImV4cCI6MTc1Njk4NjY1NX0.nvNnauQMaj4KkpdPJXXQ3jp_xfi27pX4RN43DHmuLI4
+
+###  change password
+ POST http://localhost:4000/api/auth/change-password
+ Content-Type: application/json
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmODQ0YTY1NGJmMTc3ZThkNDgxYyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhiN2Y3OTBhNjU0YmYxNzdlOGQ0ODAwIiwibmFtZSI6IkFmcm8gdHJpcCIsImNvZGUiOiJBRlJPIn0sImlhdCI6MTc2MDAyMTY2MSwiZXhwIjoxNzYwNjI2NDYxfQ.wwsZcdaE9E3onmonfLbLUKc4V8GBGKp3M2OHWtTxA3Q
+{
+   "oldPassword": "12345678",
+   "newPassword": "121212"
+}
+
+###
+POST  http://localhost:4000/api/users/change-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmODQ0YTY1NGJmMTc3ZThkNDgxYyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhiN2Y3OTBhNjU0YmYxNzdlOGQ0ODAwIiwibmFtZSI6IkFmcm8gdHJpcCIsImNvZGUiOiJBRlJPIn0sImlhdCI6MTc2MDAyMTY2MSwiZXhwIjoxNzYwNjI2NDYxfQ.wwsZcdaE9E3onmonfLbLUKc4V8GBGKp3M2OHWtTxA3Q
+
+{
+  "currentPassword": "12345678",
+  "newPassword": "12341234"
+}
+
+
+###  Admin change user password
+# POST http://localhost:4000/api/users/68b7f844a654bf177e8d481c/change-password
+# Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MDAyMzMyNywiZXhwIjoxNzYwNjI4MTI3fQ.e-Ms66FtTv0BJ3ULy0zcfEtwGSt0GAXgV1BNMm8eM0w
+# {
+#    "newPassword": "12345678"
+# }
+
+### GET USERS LIST
+GET http://localhost:4000/api/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MDAyMzMyNywiZXhwIjoxNzYwNjI4MTI3fQ.e-Ms66FtTv0BJ3ULy0zcfEtwGSt0GAXgV1BNMm8eM0w
+
+###
+POST http://localhost:4000/api/users/68b7f844a654bf177e8d481c/change-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MDAyMzk5MiwiZXhwIjoxNzYwNjI4NzkyfQ.QPNP0YMHb7EeKDaDlt8HwfIAxZ_Ku82_VpoLIcPF7uY
+
+{
+  "newPassword": "12345678"
+}
+
+
+
+### request otp for reset password
+POST http://localhost:4000/api/auth/forgot-password HTTP/1.1
+Content-Type: application/json
+
+{
+  "phone": "251934142258"
+}
+
+###
+POST http://localhost:4000/api/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MDAzMzU2MywiZXhwIjoxNzYwNjM4MzYzfQ.5LoInedOsRsZpE-ynjcCy_G4MFY7EuAJsrANTcIZ4KQ
+
+{
+  "name": "kalid abdiaziz",
+  "email": "kalid@example.com",
+  "phone": "251915052655",
+  "password": "12345678",
+  "role": "AGENCY_ADMIN",
+  "agency": "68b7ff49a654bf177e8d4911"
+}
+
+
+### otp verification
+POST http://localhost:4000/api/auth/verify-otp
+Content-Type: application/json
+
+{
+  "phone": "251934142258",
+  "code": "630174"
+}
+
+### reset password
+POST http://localhost:4000/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "userId": "68e7fc251e0632111af4744d",
+  "newPassword": "123456"
+}
