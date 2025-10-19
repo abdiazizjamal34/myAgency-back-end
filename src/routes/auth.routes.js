@@ -6,6 +6,10 @@ import {
   verifyOtp,
   resetPassword
 } from '../controllers/auth.controller.js';
+import {
+  verifyEmail,
+  resendVerificationEmail
+} from '../controllers/auth.controller.js';
 
 const router = Router();
 
@@ -14,6 +18,9 @@ router.post('/login', [
   body('password').isLength({ min: 6 }).withMessage('Password required'),
 ], login);
 
+
+router.post("/verify-email", verifyEmail);
+router.post("/resend-verification-email", resendVerificationEmail);
 router.post("/forgot-password", requestOtp);
 router.post("/verify-otp", verifyOtp);
 router.post("/reset-password", resetPassword);

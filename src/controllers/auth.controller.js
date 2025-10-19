@@ -11,6 +11,8 @@ import crypto from "crypto";
 import { sendOtpWhatsApp } from '../utils/whatsapp.js';
 dotenv.config();
 
+import { sendOtpEmail, sendVerificationEmail } from "../utils/mailer.js";
+
 function signToken(user) {
   return jwt.sign(
     { id: user._id, role: user.role, agency: user.agency },
@@ -110,33 +112,73 @@ export async function changePassword(req, res, next) {
 
 
 // 1️⃣ Request OTP
+// export async function requestOtp(req, res, next) {
+//   try {
+//     const { phone } = req.body;
+//     const user = await User.findOne({ phone });
+//     if (!user)
+//       return res.status(404).json({ message: "No user found with this phone number" });
+
+//     // generate 6-digit OTP
+//     const code = crypto.randomInt(100000, 999999).toString();
+//     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+//     // save OTP
+//     await Otp.create({
+//       user: user._id,
+//       code,
+//       expiresAt
+//     });
+
+//     // send via WhatsApp
+//     await sendOtpWhatsApp(phone, code);
+
+//     // ✅ log info for debugging
+//     console.log(
+//       `OTP created: ${code} for ${user.email} expires at ${expiresAt.toISOString()}`
+//     );
+
+//     res.json({ message: "OTP sent via WhatsApp" });
+//   } catch (err) {
+//     console.error("requestOtp error:", err);
+//     next(err);
+//   }
+// }
+
 export async function requestOtp(req, res, next) {
   try {
-    const { phone } = req.body;
-    const user = await User.findOne({ phone });
+    const { identifier, method } = req.body;   // identifier = phone or email
+
+    if (!identifier) {
+      return res.status(400).json({ message: "Phone or email is required" });
+    }
+
+    // 1️⃣ Find user by phone or email
+    const user = identifier.includes("@")
+      ? await User.findOne({ email: identifier })
+      : await User.findOne({ phone: identifier });
+
     if (!user)
-      return res.status(404).json({ message: "No user found with this phone number" });
+      return res.status(404).json({ message: "No user found with this identifier" });
 
-    // generate 6-digit OTP
+    // 2️⃣ Generate 6-digit OTP
     const code = crypto.randomInt(100000, 999999).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
 
-    // save OTP
-    await Otp.create({
-      user: user._id,
-      code,
-      expiresAt
-    });
+    await Otp.create({ user: user._id, code, expiresAt, verified: false });
 
-    // send via WhatsApp
-    await sendOtpWhatsApp(phone, code);
+    // 3️⃣ Send OTP by selected method
+    if (method === "whatsapp") {
+      await sendOtpWhatsApp(user.phone, code);
+      console.log(`✅ OTP ${code} sent via WhatsApp to ${user.phone}`);
+    } else if (method === "email") {
+      await sendOtpEmail(user.email, code);
+      console.log(`✅ OTP ${code} sent via Email to ${user.email}`);
+    } else {
+      return res.status(400).json({ message: "method must be 'whatsapp' or 'email'" });
+    }
 
-    // ✅ log info for debugging
-    console.log(
-      `OTP created: ${code} for ${user.email} expires at ${expiresAt.toISOString()}`
-    );
-
-    res.json({ message: "OTP sent via WhatsApp" });
+    res.json({ message: `OTP sent via ${method}`, expiresAt });
   } catch (err) {
     console.error("requestOtp error:", err);
     next(err);
@@ -217,6 +259,70 @@ export async function resetPassword(req, res, next) {
     res.json({ message: "Password reset successful" });
   } catch (err) {
     console.error("resetPassword error:", err);
+    next(err);
+  }
+}
+
+
+// Email verification
+export async function verifyEmail(req, res, next) {
+  try {
+    const { email, code } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (
+      user.emailVerificationCode !== code ||
+      user.emailVerificationExpires < new Date()
+    ) {
+      return res.status(400).json({ message: "Invalid or expired verification code" });
+    }
+
+    user.emailVerified = true;
+    user.emailVerificationCode = null;
+    user.emailVerificationExpires = null;
+    await user.save();
+
+    res.json({ message: "Email verified successfully" });
+  } catch (err) {
+    console.error("verifyEmail error:", err);
+    next(err);
+  }
+}
+
+
+export async function resendVerificationEmail(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    if (user.emailVerified)
+      return res.status(400).json({ message: "Email already verified" });
+
+    // Generate a new code
+    const newCode = crypto.randomInt(100000, 999999).toString();
+    const newExpiry = new Date(Date.now() + 15 * 60 * 1000);
+
+    // Update user record
+    user.emailVerificationCode = newCode;
+    user.emailVerificationExpires = newExpiry;
+    await user.save();
+
+    // Send email again
+    await sendVerificationEmail(email, newCode);
+
+    console.log(`📧 Resent verification email to ${email} (expires ${newExpiry})`);
+
+    res.json({
+      message: "Verification email resent successfully",
+      email,
+    });
+  } catch (err) {
+    console.error("resendVerificationEmail error:", err);
     next(err);
   }
 }

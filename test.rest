@@ -9,15 +9,15 @@
 #  }
 
 
-#  {
-#     "email" : "afro@example.com",
-#     "password" : "12345678"
-#  }
+ {
+    "email" : "afro@example.com",
+    "password" : "123456"
+ }
 
-{
-  "email": "john@example.com",
-  "password": "StrongPassword123"
-}
+# {
+#   "email": "john@example.com",
+#   "password": "StrongPassword123"
+# }
 
 
 ###
@@ -121,11 +121,11 @@ Content-Type: application/json
 ###
 POST http://localhost:4000/api/users
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MDAzMzU2MywiZXhwIjoxNzYwNjM4MzYzfQ.5LoInedOsRsZpE-ynjcCy_G4MFY7EuAJsrANTcIZ4KQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmODQ0YTY1NGJmMTc3ZThkNDgxYyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhiN2Y3OTBhNjU0YmYxNzdlOGQ0ODAwIiwibmFtZSI6IkFmcm8gdHJpcCIsImNvZGUiOiJBRlJPIn0sImlhdCI6MTc2MDg3Njg3OCwiZXhwIjoxNzYxNDgxNjc4fQ.-MA21gdvQt0QDmXJjQSaFIpiTkfH8o0nvf2jp9hPK4I
 
 {
-  "name": "kalid abdiaziz",
-  "email": "kalid@example.com",
+  "name": "new abdiaziz",
+  "email": "abdiazizjamal499@gmail.com",
   "phone": "251915052655",
   "password": "12345678",
   "role": "AGENCY_ADMIN",
@@ -149,4 +149,45 @@ Content-Type: application/json
 {
   "userId": "68e7fc251e0632111af4744d",
   "newPassword": "123456"
+}
+
+
+### email verification
+POST http://localhost:4000/api/auth/resend-verification-email
+Content-Type: application/json
+
+{
+  "email": "kalid@example.com"
+}
+
+### create user 
+POST http://localhost:4000/api/users
+Content-Type: application/json
+Authorization:  Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmODQ0YTY1NGJmMTc3ZThkNDgxYyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhiN2Y3OTBhNjU0YmYxNzdlOGQ0ODAwIiwibmFtZSI6IkFmcm8gdHJpcCIsImNvZGUiOiJBRlJPIn0sImlhdCI6MTc2MDg3Njg3OCwiZXhwIjoxNzYxNDgxNjc4fQ.-MA21gdvQt0QDmXJjQSaFIpiTkfH8o0nvf2jp9hPK4I
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "phone": "251912345678",
+  "password": "testpassword",
+  "role": "PARTNER",
+  "agency": "68b7ff49a654bf177e8d4911"
+}
+
+#### verify email
+POST http://localhost:4000/api/auth/verify-email
+Content-Type: application/json
+
+{
+  "email": "hapipproduction@gmail.com",
+  "code": "254471"
+}
+ 
+
+### request otp for reset password
+ POST http://localhost:4000/api/auth/forgot-password HTTP/1.1
+Content-Type: application/json
+
+{
+    "identifier": "abdiazizjamal499@gmail.com",
+    "method": "email"
 }

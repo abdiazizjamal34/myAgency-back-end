@@ -5,6 +5,9 @@ import { ROLES } from '../utils/constants.js';
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  emailVerified: { type: Boolean, default: false },
+  emailVerificationCode: { type: String },
+  emailVerificationExpires: { type: Date },
   phone: { type: String, required: true, unique: true, trim: true },
   password: { type: String, required: true, minlength: 6 },
   role: { type: String, enum: Object.values(ROLES), default: ROLES.PARTNER },
