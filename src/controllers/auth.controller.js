@@ -147,40 +147,48 @@ export async function changePassword(req, res, next) {
 
 export async function requestOtp(req, res, next) {
   try {
-    const { identifier, method } = req.body;   // identifier = phone or email
+    const { identifier, method = 'email' } = req.body; // identifier = email or phone
+    if (!identifier) return res.status(400).json({ message: 'Phone or email is required' });
 
-    if (!identifier) {
-      return res.status(400).json({ message: "Phone or email is required" });
-    }
-
-    // 1️⃣ Find user by phone or email
-    const user = identifier.includes("@")
+    const user = identifier.includes('@')
       ? await User.findOne({ email: identifier })
       : await User.findOne({ phone: identifier });
 
-    if (!user)
-      return res.status(404).json({ message: "No user found with this identifier" });
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // 2️⃣ Generate 6-digit OTP
-    const code = crypto.randomInt(100000, 999999).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    // generate 6-digit string OTP
+    const code = String(Math.floor(100000 + Math.random() * 900000)).padStart(6, '0');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    await Otp.create({ user: user._id, code, expiresAt, verified: false });
+    // persist to user (legacy) and to Otp collection (single source)
+    user.emailVerificationCode = code;
+    user.emailVerificationExpires = expiresAt;
+    await user.save();
 
-    // 3️⃣ Send OTP by selected method
-    if (method === "whatsapp") {
-      await sendOtpWhatsApp(user.phone, code);
-      console.log(`✅ OTP ${code} sent via WhatsApp to ${user.phone}`);
-    } else if (method === "email") {
-      await sendOtpEmail(user.email, code);
-      console.log(`✅ OTP ${code} sent via Email to ${user.email}`);
+    await Otp.create({
+      user: user._id,
+      code,
+      type: method === 'email' ? 'email' : (method === 'whatsapp' ? 'whatsapp' : 'sms'),
+      expiresAt,
+      verified: false
+    });
+
+    // send using the same code you saved — use verification template for email
+    if (method === 'whatsapp') {
+      await sendOtpWhatsApp(user.phone, code); // ensure helper exists
+      console.log(`WhatsApp OTP ${code} sent to ${user.phone}`);
+    } else if (method === 'sms') {
+      await sendOtpSms(user.phone, code); // ensure helper exists
+      console.log(`SMS OTP ${code} sent to ${user.phone}`);
     } else {
-      return res.status(400).json({ message: "method must be 'whatsapp' or 'email'" });
+      // email verification uses verification template -- not "Password Reset"
+      await sendVerificationEmail(user.email, code, user.name);
+      console.log(`✅ Verification OTP ${code} sent via Email to ${user.email}`);
     }
 
-    res.json({ message: `OTP sent via ${method}`, expiresAt });
+    res.json({ message: `${method || 'email'} OTP sent` });
   } catch (err) {
-    console.error("requestOtp error:", err);
+    console.error('requestOtp error:', err);
     next(err);
   }
 }
@@ -263,25 +271,47 @@ export async function resetPassword(req, res, next) {
 export async function verifyEmail(req, res, next) {
   try {
     const { email, code } = req.body;
+    if (!email || !code) return res.status(400).json({ message: 'email and code are required' });
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (
-      user.emailVerificationCode !== code ||
-      user.emailVerificationExpires < new Date()
-    ) {
-      return res.status(400).json({ message: "Invalid or expired verification code" });
+    const provided = String(code).trim();
+
+    // 1) check user fields first (legacy)
+    if (user.emailVerificationCode && String(user.emailVerificationCode).trim() === provided && user.emailVerificationExpires && user.emailVerificationExpires > new Date()) {
+      user.emailVerified = true;
+      user.emailVerificationCode = undefined;
+      user.emailVerificationExpires = undefined;
+      await user.save();
+      return res.json({ message: 'Email verified successfully' });
     }
 
-    user.emailVerified = true;
-    user.emailVerificationCode = null;
-    user.emailVerificationExpires = null;
-    await user.save();
+    // 2) fallback: check Otp collection
+    const otpRecord = await Otp.findOne({
+      user: user._id,
+      code: provided,
+      type: 'email',
+      verified: false,
+      expiresAt: { $gt: new Date() }
+    });
 
-    res.json({ message: "Email verified successfully" });
+    if (otpRecord) {
+      otpRecord.verified = true;
+      await otpRecord.save();
+      user.emailVerified = true;
+      // clear legacy fields too
+      user.emailVerificationCode = undefined;
+      user.emailVerificationExpires = undefined;
+      await user.save();
+      return res.json({ message: 'Email verified successfully' });
+    }
+
+    // debug info (do not return sensitive details in production)
+    const latest = await Otp.findOne({ user: user._id }).sort({ createdAt: -1 }).lean();
+    console.error('verifyEmail failed', { email, provided, userField: user.emailVerificationCode, latest });
+    return res.status(400).json({ message: 'Invalid or expired verification code' });
   } catch (err) {
-    console.error("verifyEmail error:", err);
     next(err);
   }
 }
