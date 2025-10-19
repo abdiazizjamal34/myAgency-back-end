@@ -189,42 +189,37 @@ export async function requestOtp(req, res, next) {
 // 2️⃣ Verify OTP
 export async function verifyOtp(req, res, next) {
   try {
-    const { phone, code } = req.body;
+    const { phone, email, identifier, code, otp } = req.body;
+    const providedCode = String(code ?? otp ?? '').trim();
+    if (!providedCode) return res.status(400).json({ message: 'phone/email and code are required' });
 
-    // 1️⃣ Find user by phone
-    const user = await User.findOne({ phone });
-    if (!user) {
-      console.log("❌ No user found for phone:", phone);
-      return res.status(404).json({ message: "User not found" });
+    // find user by phone or email or identifier
+    let user;
+    if (phone) user = await User.findOne({ phone });
+    else if (email) user = await User.findOne({ email });
+    else if (identifier) {
+      user = identifier.includes('@') ? await User.findOne({ email: identifier }) : await User.findOne({ phone: identifier });
     }
 
-    // 2️⃣ Find matching OTP
-    const now = new Date();
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
     const otpRecord = await Otp.findOne({
       user: user._id,
-      code: String(code), // ensure both sides are strings
-      expiresAt: { $gte: now },
-      verified: false
+      code: providedCode,
+      verified: false,
+      expiresAt: { $gt: new Date() },
     });
 
     if (!otpRecord) {
-      console.log("❌ Invalid or expired OTP", { phone, code, now });
-      return res.status(400).json({ message: "Invalid or expired OTP" });
+      console.error('OTP verify failed', { user: user._id.toString(), providedCode });
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
-    // 3️⃣ Mark OTP as verified
     otpRecord.verified = true;
     await otpRecord.save();
 
-    console.log(`✅ OTP ${code} verified for ${user.email}`);
-
-    // 4️⃣ Respond with userId to use in reset-password
-    res.json({
-      message: "OTP verified successfully",
-      userId: user._id
-    });
+    res.json({ message: 'OTP verified successfully', userId: user._id });
   } catch (err) {
-    console.error("verifyOtp error:", err);
     next(err);
   }
 }

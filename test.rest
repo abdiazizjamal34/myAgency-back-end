@@ -178,8 +178,8 @@ POST http://localhost:4000/api/auth/verify-email
 Content-Type: application/json
 
 {
-  "email": "hapipproduction@gmail.com",
-  "code": "254471"
+  "email": "abdiazizjamal499@gmail.com",
+  "code": "285206"
 }
  
 
@@ -190,4 +190,13 @@ Content-Type: application/json
 {
     "identifier": "abdiazizjamal499@gmail.com",
     "method": "email"
+}
+
+### verify email otp
+POST http://localhost:4000/api/auth/verify-otp
+Content-Type: application/json
+
+{
+  "email": "abdiazizjamal499@gmail.com",
+  "code": "767368"
 }
