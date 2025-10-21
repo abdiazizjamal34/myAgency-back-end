@@ -1,6 +1,17 @@
+import fs from "fs";
+import path from "path";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
+
+function loadTemplate(name, data = {}) {
+  const filePath = path.resolve(`templates/${name}.html`);
+  let html = fs.readFileSync(filePath, "utf8");
+  Object.entries(data).forEach(([key, val]) => {
+    html = html.replace(new RegExp(`{{${key}}}`, "g"), val || "");
+  });
+  return html;
+}
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -12,50 +23,52 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendVerificationEmail(to, code, name = '') {
+async function sendMail({ to, subject, html, text }) {
   const mailOptions = {
     from: `"Agency System" <${process.env.SMTP_USER}>`,
     to,
-    subject: "Verify your email address",
-    html: `
-      <h2>Email Verification</h2>
-      <p>Hello${name ? `, ${name}` : ''}</p> 
-      <p>Your verification code is:</p>
-      <h3 style="color:green;">${code}</h3>
-      <p>This code expires in 15 minutes.</p>
-    `,
+    subject,
+    html,
+    text,
   };
-
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Verification email sent to:", to);
+    console.log(`✅ Email sent to ${to}: ${info.messageId}`);
     return info;
   } catch (err) {
-    console.error("❌ Error sending verification email:", err.message);
+    console.error(`❌ Error sending email to ${to}:`, err.message);
     throw err;
   }
 }
 
-export async function sendOtpEmail(to, code, name = '') {
-  const mailOptions = {
-    from: `"Agency System" <${process.env.SMTP_USER}>`,
-    to,
-    subject: "Password Reset OTP Code",
-    html: `
-      <h2>Password Reset</h2>
-      <p>Hello${name ? `, ${name}` : ''}</p>
-      <p>Your OTP code is:</p>
-      <h1 style="color:#008CBA;">${code}</h1>
-      <p>This code expires in 10 minutes.</p>
-    `,
-  };
+export async function sendVerificationEmail(to, code, name = "") {
+  const html = loadTemplate("welcomeVerify", {
+    name,
+    code,
+    verifyLink: `${process.env.FRONTEND_URL}/verify-email?email=${encodeURIComponent(to)}`,
+    supportEmail: process.env.SUPPORT_EMAIL,
+    year: new Date().getFullYear(),
+  });
+  const subject = "Verify your email address";
+  return sendMail({ to, subject, html, text: `Your verification code is ${code}` });
+}
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`📧 OTP email sent to ${to}`);
-    return info;
-  } catch (err) {
-    console.error("❌ Error sending OTP email:", err.message);
-    throw err;
-  }
+export async function sendOtpEmail(to, code, name = "") {
+  const html = loadTemplate("passwordReset", {
+    name,
+    code,
+    year: new Date().getFullYear(),
+  });
+  const subject = "Password reset OTP code";
+  return sendMail({ to, subject, html, text: `Your OTP code is ${code}` });
+}
+
+export async function sendPasswordChangedEmail(to, name = "") {
+  const html = loadTemplate("passwordChanged", {
+    name,
+    loginLink: `${process.env.FRONTEND_URL}/login`,
+    year: new Date().getFullYear(),
+  });
+  const subject = "Your password has been changed";
+  return sendMail({ to, subject, html, text: "Your password was changed. If you did not do this, contact support." });
 }
