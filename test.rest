@@ -39,7 +39,7 @@
 ###
 GET  http://localhost:4000/api/reports/summary?day=2025-08-28
  Content-Type: application/json
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1OTQxOTYxMSwiZXhwIjoxNzYwMDI0NDExfQ.lfYG6c09IwPnZw54kdIhaqq-Tn8SibvQqNpFFoVCirU
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MTU2NDk3MSwiZXhwIjoxNzYxNjUxMzcxfQ.PNTEoFJcNaDL692CPx0rZuoeu8WNFPp_D6nXb95NBgg
 
 ###
  GET  http://localhost:4000/api/reports/summary?month=2025-08
@@ -52,9 +52,9 @@ GET http://localhost:4000/api/reports/summary?from=2025-07-01&to=2025-07-15
 
 
 ###
-GET http://localhost:4000/api/records?day=2025-08-28
+GET http://localhost:4000/api/records?day=2025-10-27
 Content-Type: application/json
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjA0MWYzYmU2NzZlMjhhNDQzNmQzOSIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOiI2OGIwMmZhMDY3YzE4ZDc2MTkzZTdiN2QiLCJpYXQiOjE3NTYzODE4NTUsImV4cCI6MTc1Njk4NjY1NX0.nvNnauQMaj4KkpdPJXXQ3jp_xfi27pX4RN43DHmuLI4
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MTU2NDk3MSwiZXhwIjoxNzYxNjUxMzcxfQ.PNTEoFJcNaDL692CPx0rZuoeu8WNFPp_D6nXb95NBgg
 
 ###
 GET http://localhost:4000/api/records?month=2025-08
