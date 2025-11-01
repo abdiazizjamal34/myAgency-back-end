@@ -146,3 +146,35 @@ export async function trend(req, res, next) {
     next(err);
   }
 }
+
+export async function paymentSummary(req, res, next) {
+  try {
+    const match = baseMatch(req);
+
+    const result = await Record.aggregate([
+      { $match: match },
+      // normalize paymentMethod (use 'Unknown' when missing/null)
+      { $addFields: { paymentMethodNorm: { $ifNull: ['$paymentMethod', 'Unknown'] } } },
+      {
+        $group: {
+          _id: '$paymentMethodNorm',
+          totalPaid: { $sum: { $ifNull: ['$sellingPrice', 0] } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          paymentMethod: '$_id',
+          totalPaid: 1,
+          count: 1,
+          _id: 0,
+        },
+      },
+      { $sort: { totalPaid: -1 } },
+    ]);
+
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}

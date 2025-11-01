@@ -10,6 +10,7 @@ import userRoutes from './routes/user.routes.js';
 import recordRoutes from './routes/record.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import errorHandler from './utils/errorHandler.js';
+import path from 'path';
 
 dotenv.config();
 const app = express();
@@ -28,6 +29,9 @@ app.use('/api/agencies', agencyRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/reports', reportRoutes);
+
+
+app.use('/uploads', express.static(path.resolve('uploads')));
 
 // central error handler
 app.use(errorHandler);
