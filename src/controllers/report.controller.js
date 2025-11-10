@@ -71,7 +71,7 @@ export async function summary(req, res, next) {
         count: { $sum: 1 },
       } },
       { $addFields: {
-        totalIncome: '$totalCommission',
+        totalIncome: { $sum: ['$totalCommission', '$totalExpenses'] },
         totalProfit: { $subtract: ['$totalCommission', 0] },
       } },
       { $project: { _id: 0 } }
