@@ -63,7 +63,7 @@ export async function summary(req, res, next) {
     const pipeline = [
       { $match: baseMatch(req) },
       { $group: {
-        _id: null,
+        _id:  '$agency',
         totalSelling: { $sum: '$sellingPrice' },
         totalBuying: { $sum: '$buyingPrice' },
         totalExpenses: { $sum: '$expenses' },
@@ -72,7 +72,7 @@ export async function summary(req, res, next) {
       } },
       { $addFields: {
         totalIncome: '$totalCommission',
-        totalProfit: { $subtract: ['$totalCommission', '$totalExpenses'] },
+        totalProfit: { $subtract: ['$totalCommission', 0] },
       } },
       { $project: { _id: 0 } }
     ];
@@ -81,6 +81,60 @@ export async function summary(req, res, next) {
       totalSelling: 0, totalBuying: 0, totalExpenses: 0,
       totalCommission: 0, totalIncome: 0, totalProfit: 0, count: 0
     });
+  } catch (err) { next(err); }
+}
+
+///summary by agancy
+export async function byAgency(req, res, next) {
+  try {
+    const pipeline = [
+      { $match: baseMatch(req) },
+      {
+        $group: {
+          _id: '$agency',
+          totalSelling: { $sum: { $ifNull: ['$sellingPrice', 0] } },
+          totalBuying: { $sum: { $ifNull: ['$buyingPrice', 0] } },
+          totalExpenses: { $sum: { $ifNull: ['$expenses', 0] } },
+          totalCommission: { $sum: { $ifNull: ['$commission', 0] } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: {
+          totalIncome: '$totalCommission',
+          totalProfit: { $subtract: ['$totalCommission', '$totalExpenses'] },
+        },
+      },
+      // attach agency metadata
+      {
+        $lookup: {
+          from: 'agencies',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'agency',
+        },
+      },
+      { $unwind: { path: '$agency', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          agencyId: '$_id',
+          agencyName: '$agency.name',
+          agencyLogo: '$agency.logo',
+          totalSelling: 1,
+          totalBuying: 1,
+          totalExpenses: 1,
+          totalCommission: 1,
+          totalIncome: 1,
+          totalProfit: 1,
+          count: 1,
+        },
+      },
+      { $sort: { totalProfit: -1 } },
+    ];
+
+    const results = await Record.aggregate(pipeline);
+    res.json(results);
   } catch (err) { next(err); }
 }
 

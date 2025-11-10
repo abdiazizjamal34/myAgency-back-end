@@ -11,10 +11,11 @@ import {
   deleteAgency,
   addAgencyAdmin,
   uploadAgencyLogoHandler,
-  getAgencyLogo
+  getAgencyLogo,
+  
 } from '../controllers/agency.controller.js';
 import { uploadAgencyLogo } from '../middleware/upload.js';
-
+import { byAgency } from '../controllers/report.controller.js';                    
 const router = Router();
 
 router.use(auth);
@@ -43,5 +44,8 @@ router.post(
   (req, res, next) => uploadAgencyLogo(req, res, err => { if (err) return next(err); next(); }),
   uploadAgencyLogoHandler
 );
+
+ /// summary by agency
+router.get('/summary/byagency', requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN), byAgency);
 
 export default router;

@@ -14,9 +14,19 @@
 #     "password" : "123456"
 #  }
 
+# {
+#   "email": "abdiaziz.jamal3414@gmail.com",
+#   "password": "12345678"
+# }
+
+# {
+#   "email": "ahmedto1074@gmail.com",
+#   "password": "lacaso3414"
+# }
+
 {
-  "email": "abdiaziz.jamal3414@gmail.com",
-  "password": "12345678"
+  "email": "aabiabdilahi@gmail.com",
+  "password": "123456"
 }
 
 
@@ -38,14 +48,13 @@
   ### get 
 
 ###
-GET  http://localhost:4000/api/reports/summary?day=2025-08-28
+GET  http://localhost:4000/api/reports/summary?day=2025-11-11
  Content-Type: application/json
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MTU2NDk3MSwiZXhwIjoxNzYxNjUxMzcxfQ.PNTEoFJcNaDL692CPx0rZuoeu8WNFPp_D6nXb95NBgg
-
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUzNTZkODhmMmJlYzhjYTQ4NWY3OCIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTM0YWM4OGYyYmVjOGNhNDg1ZjY1IiwibmFtZSI6IlRlc3QiLCJjb2RlIjoiVEVTVDAxIn0sImlhdCI6MTc2MjgxMTkwMiwiZXhwIjoxNzYyODk4MzAyfQ.iaZ1zmjnxlrIZb_BLtrRxSCge95MLVK8Bi84igf7NOU
 ###
- GET  http://localhost:4000/api/reports/summary?month=2025-08
+ GET  http://localhost:4000/api/reports/summary?month=2025-11
  Content-Type: application/json
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjA0MWYzYmU2NzZlMjhhNDQzNmQzOSIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOiI2OGIwMmZhMDY3YzE4ZDc2MTkzZTdiN2QiLCJpYXQiOjE3NTYzODE4NTUsImV4cCI6MTc1Njk4NjY1NX0.nvNnauQMaj4KkpdPJXXQ3jp_xfi27pX4RN43DHmuLI4
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjgwODE5MywiZXhwIjoxNzYyODk0NTkzfQ.e8ugCt-zKMpYyu0qqjczQxBoCgSh-AWl-76FaFTVyrk
 ###
 GET http://localhost:4000/api/reports/summary?from=2025-07-01&to=2025-07-15
  Content-Type: application/json
@@ -214,13 +223,12 @@ Content-Type: application/json
 ### pyment summary report
 GET http://localhost:4000/api/reports/paymentSummary?day=2025-10-29
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MTk4MzI4MywiZXhwIjoxNzYyMDY5NjgzfQ.lGN0eQ_ej11SFVHn1Ep6gDcXbcZfqxhUnnFsLFjatKg
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjgwNzQ5NywiZXhwIjoxNzYyODkzODk3fQ.CPMuI-Ha1IzKCsBE52P4z8DELpqQfixi7gJRcEfTGc0
 
 ### payment summary report month
 GET http://localhost:4000/api/reports/paymentSummary?month=2025-10
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MTk4MzI4MywiZXhwIjoxNzYyMDY5NjgzfQ.lGN0eQ_ej11SFVHn1Ep6gDcXbcZfqxhUnnFsLFjatKg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjgwNzQ5NywiZXhwIjoxNzYyODkzODk3fQ.CPMuI-Ha1IzKCsBE52P4z8DELpqQfixi7gJRcEfTGc0
 
 
 ### reacord update
@@ -244,7 +252,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZ
 
 GET http://localhost:4000/api/records 
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjAwNDU4MywiZXhwIjoxNzYyMDkwOTgzfQ.7z13ONMYuaxC9L5hHB3wU3Yf48j2Fln9gSYXWo7AL50  
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjYwNTgzNywiZXhwIjoxNzYyNjkyMjM3fQ.awL-BJcv2x8xeP2me90a9saS69fzxj8HVkzLol6kFNU
 
 ### upload agency logo
 POST http://localhost:4000/api/agencies/68f52a59e7d487337ed2c78f/logo
@@ -258,3 +266,7 @@ Content-Type: image/png
 Content-Type: application/json  
 Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjAxMzU1NywiZXhwIjoxNzYyMDk5OTU3fQ.-tLOUJTod_DOt9jEpyN34hr4acwEoCaYux1I2rGvlSA
 
+### by agency summary report
+ GET http://localhost:4000/api/agencies/summary/byagency?from=2025-08-01&to=2025-11
+  Content-Type: application/json
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjgwNzQ5NywiZXhwIjoxNzYyODkzODk3fQ.CPMuI-Ha1IzKCsBE52P4z8DELpqQfixi7gJRcEfTGc0
