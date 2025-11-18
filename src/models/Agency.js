@@ -9,6 +9,7 @@ const AgencySchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
-AgencySchema.index({ code: 1 });
+// AgencySchema.index({ code: 1 });
 
-export default mongoose.model('Agency', AgencySchema);
+// export default mongoose.model('Agency', AgencySchema);
+export default mongoose.models.Agency || mongoose.model('Agency', AgencySchema);
