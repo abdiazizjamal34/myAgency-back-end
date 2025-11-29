@@ -72,3 +72,26 @@ export async function sendPasswordChangedEmail(to, name = "") {
   const subject = "Your password has been changed";
   return sendMail({ to, subject, html, text: "Your password was changed. If you did not do this, contact support." });
 }
+
+// Generic email sender for notifications / bulk messages
+export async function sendGenericEmail(to, subject, text) {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: process.env.SMTP_SECURE === "true",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Agency System" <${process.env.SMTP_USER}>`,
+    to,
+    subject,
+    text, // plain text (you can change to html if you want)
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`📧 Notification email sent to ${to}`);
+}

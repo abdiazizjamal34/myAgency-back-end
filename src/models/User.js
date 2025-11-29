@@ -16,8 +16,7 @@ const UserSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
-UserSchema.index({ agency: 1 });
-UserSchema.index({ email: 1 }, { unique: true });
+// UserSchema.index({ email: 1 }, { unique: true });
 
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
@@ -30,4 +29,5 @@ UserSchema.methods.comparePassword = async function(candidate) {
   return bcrypt.compare(candidate, this.password);
 };
 
-export default mongoose.model('User', UserSchema);
+// export default mongoose.model('User', UserSchema);
+export default mongoose.models.User || mongoose.model('User', UserSchema);

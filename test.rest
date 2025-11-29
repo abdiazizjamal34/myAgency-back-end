@@ -275,4 +275,47 @@ Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdl
 ### by agency detail report
  GET   http://3.88.179.134/api/agencies/summary/byagency?from=2025-08&to=2025-11
   Content-Type: application/json
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2MzQ3NjIyNSwiZXhwIjoxNzYzNTYyNjI1fQ.MOpK3qNz_BMPcbTI6bLWQ_LYW77p99mnPNoGdoad6V8
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2Mzc5NDExOSwiZXhwIjoxNzYzODgwNTE5fQ.ZV4XNIu5FvVHSxSjF0unmEAXIU_8Uvss8-8kPcoco74
+
+
+### massege notification 
+POST http://localhost:4000/api/notifications/send
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2Mzc5NDExOSwiZXhwIjoxNzYzODgwNTE5fQ.ZV4XNIu5FvVHSxSjF0unmEAXIU_8Uvss8-8kPcoco74
+
+{
+  "userId": "68f52a7ee7d487337ed2c79c",
+  "channel": "email",
+  "subject": "Monthly Report",
+  "message": "Hello, your monthly report is ready."
+}
+
+### massege notification 
+POST http://localhost:4000/api/notifications/broadcast
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2Mzc5NDExOSwiZXhwIjoxNzYzODgwNTE5fQ.ZV4XNIu5FvVHSxSjF0unmEAXIU_8Uvss8-8kPcoco74
+
+{
+  "channel": "email",
+  "subject": "System Maintenance",
+  "message": "We will have maintenance tonight at 10:00 PM."
+}
+
+
+### massege notification Agency
+POST http://localhost:4000/api/notifications/agency
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NDQwMzk0MCwiZXhwIjoxNzY0NDkwMzQwfQ.9ttUiwAes-BEKUfX_oBSrFnL19O23iyCDFFVI-v0Pyk
+
+{
+  "agencyId": "68f534ac88f2bec8ca485f65",
+  "channel":"email",
+  "subject": "Agency Notice",
+  "message": "Dear team, please this an a test bulk notification. how are you doing today?"
+}
+
+
+### get notifications
+GET http://localhost:4000/api/notifications/history
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2Mzc5NDExOSwiZXhwIjoxNzYzODgwNTE5fQ.ZV4XNIu5FvVHSxSjF0unmEAXIU_8Uvss8-8kPcoco74 

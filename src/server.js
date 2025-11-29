@@ -11,6 +11,7 @@ import recordRoutes from './routes/record.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import errorHandler from './utils/errorHandler.js';
 import path from 'path';
+import notificationRoutes from './routes/notification.routes.js';
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/agencies', agencyRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/reports', reportRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 
 app.use('/uploads', express.static(path.resolve('uploads')));
