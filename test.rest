@@ -1,4 +1,4 @@
-####
+####  login
 
 POST http://localhost:4000/api/auth/login
 #  POST  http://3.88.179.134/api/auth/login
@@ -32,10 +32,9 @@ POST http://localhost:4000/api/auth/login
 
 
 ###
- POST  http://3.88.179.134/api/records
+POST http://localhost:4000/api/records
   Content-Type: application/json
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjA0MWYzYmU2NzZlMjhhNDQzNmQzOSIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOiI2OGIwMmZhMDY3YzE4ZDc2MTkzZTdiN2QiLCJpYXQiOjE3NTYzODE4NTUsImV4cCI6MTc1Njk4NjY1NX0.nvNnauQMaj4KkpdPJXXQ3jp_xfi27pX4RN43DHmuLI4
-
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NTAwOTc4OCwiZXhwIjoxNzY1MDk2MTg4fQ.E-9mrd7jrfAsJbJsl6tEpsS7ouDLuePIAgSerEWwbEU
 {
    "customerName": "mmm", 
    "typeOfService": "flight",
@@ -132,16 +131,58 @@ Content-Type: application/json
 ###
 POST http://localhost:4000/api/users
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmODQ0YTY1NGJmMTc3ZThkNDgxYyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhiN2Y3OTBhNjU0YmYxNzdlOGQ0ODAwIiwibmFtZSI6IkFmcm8gdHJpcCIsImNvZGUiOiJBRlJPIn0sImlhdCI6MTc2MDg3Njg3OCwiZXhwIjoxNzYxNDgxNjc4fQ.-MA21gdvQt0QDmXJjQSaFIpiTkfH8o0nvf2jp9hPK4I
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjE1OTI2MywiZXhwIjoxNzY2NzY0MDYzfQ.gCEeABP8wGn7M7tFsW7YdIHtb1OeM4Vjrcu4sFRKNKg
 
 {
-  "name": "new abdiaziz",
-  "email": "abdiazizjamal499@gmail.com",
-  "phone": "251915052655",
+  "name": "farhan abdi qadir ",
+  "email": "abdihooyobarber@gmail.com",
+  "phone": "251977731110",
   "password": "12345678",
   "role": "AGENCY_ADMIN",
-  "agency": "68b7ff49a654bf177e8d4911"
+  "agency": "6944f846fbf30bdcb2c7506f"
 }
+
+
+### get agency details
+ GET http://localhost:4000/api/agencies/6944f846fbf30bdcb2c7506f  
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjgxOTI2MiwiZXhwIjoxNzY3NDI0MDYyfQ.m8Av-sI-qChI3d9Cw0P9gpsMG-wgON60_SLDaV7S1MQ
+
+
+  ### agency create
+POST http://localhost:4000/api/agencies
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjE1OTI2MywiZXhwIjoxNzY2NzY0MDYzfQ.gCEeABP8wGn7M7tFsW7YdIHtb1OeM4Vjrcu4sFRKNKg
+
+{
+  "name": "ABDI HOOYO TRAVEL AGENCY",
+  "code": "BAHIR-B1",
+  "address": "niyala insurance boulding ",
+  "phone": "251939554111",
+  "email": "abdihooyotabb1@gmail.com "
+
+}
+
+### agency update
+PUT http://localhost:4000/api/agencies/68fe2d7aaf9e8720db6401c7
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjE1OTI2MywiZXhwIjoxNzY2NzY0MDYzfQ.gCEeABP8wGn7M7tFsW7YdIHtb1OeM4Vjrcu4sFRKNKg
+
+{
+  "name": "ABDI HOOYO TRAVEL AGENCY",
+  "code": "ADD-B1",
+  "address": "BOLE MECHAIL, INFRONT OF COSOB ",
+  "phone": "251986663436"
+
+} 
+
+### get all agencies
+GET http://localhost:4000/api/agencies    
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjE1OTI2MywiZXhwIjoxNzY2NzY0MDYzfQ.gCEeABP8wGn7M7tFsW7YdIHtb1OeM4Vjrcu4sFRKNKg
+
+
+
 
 
 ### otp verification
@@ -253,8 +294,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZ
 
 GET http://localhost:4000/api/records 
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjYwNTgzNywiZXhwIjoxNzYyNjkyMjM3fQ.awL-BJcv2x8xeP2me90a9saS69fzxj8HVkzLol6kFNU
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NTAxNzY1NCwiZXhwIjoxNzY1MTA0MDU0fQ.K5g5Fw32dPx2WDvaRz60b23wF6KcPLsRsYlAsSKtCvg
 ### upload agency logo
 POST http://localhost:4000/api/agencies/68f52a59e7d487337ed2c78f/logo
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -266,6 +306,12 @@ Content-Type: image/png
  GET http://localhost:4000/api/agencies/68f52a59e7d487337ed2c78f/logo
 Content-Type: application/json  
 Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjAxMzU1NywiZXhwIjoxNzYyMDk5OTU3fQ.-tLOUJTod_DOt9jEpyN34hr4acwEoCaYux1I2rGvlSA
+
+### get agency details
+ GET http://localhost:4000/api/agencies/68f52a59e7d487337ed2c78f
+Content-Type: application/json  
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZjUyYTdlZTdkNDg3MzM3ZWQyYzc5YyIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2MjAxMzU1NywiZXhwIjoxNzYyMDk5OTU3fQ.-tLOUJTod_DOt9jEpyN34hr4acwEoCaYux1I2rGvlSA
+
 
 ### by agency summary report
  GET http://localhost:4000/api/agencies/summary/byagency?from=2025-08-01&to=2025-11
@@ -318,4 +364,45 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiY
 ### get notifications
 GET http://localhost:4000/api/notifications/history
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2Mzc5NDExOSwiZXhwIjoxNzYzODgwNTE5fQ.ZV4XNIu5FvVHSxSjF0unmEAXIU_8Uvss8-8kPcoco74 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NTAwOTc4OCwiZXhwIjoxNzY1MDk2MTg4fQ.E-9mrd7jrfAsJbJsl6tEpsS7ouDLuePIAgSerEWwbEU
+
+
+### get agencies list
+GET http://localhost:4000/api/agencies
+Content-Type: application/json
+Authorization:   Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NTAxNzY1NCwiZXhwIjoxNzY1MTA0MDU0fQ.K5g5Fw32dPx2WDvaRz60b23wF6KcPLsRsYlAsSKtCvg
+
+
+
+### ticket_templets 
+GET http://localhost:4000/api/ticket-templates
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjgxOTI2MiwiZXhwIjoxNzY3NDI0MDYyfQ.m8Av-sI-qChI3d9Cw0P9gpsMG-wgON60_SLDaV7S1MQ
+
+
+### get my template
+GET http://localhost:4000/api/ticket-templates/my
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjgxOTI2MiwiZXhwIjoxNzY3NDI0MDYyfQ.m8Av-sI-qChI3d9Cw0P9gpsMG-wgON60_SLDaV7S1MQ
+
+
+### update my template
+PUT http://localhost:4000/api/ticket-templates/my
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjgxOTI2MiwiZXhwIjoxNzY3NDI0MDYyfQ.m8Av-sI-qChI3d9Cw0P9gpsMG-wgON60_SLDaV7S1MQ
+
+{
+  "name": "My Template",
+  "key": "my-template",
+  "type": "PREMADE",
+  "schemaJson": {},
+  "html": null,
+  "isActive": true
+}
+
+
+### tickt render
+POST http://localhost:4000/api/tickets/694fc3fa68c576eb790de815/render
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjgxOTI2MiwiZXhwIjoxNzY3NDI0MDYyfQ.m8Av-sI-qChI3d9Cw0P9gpsMG-wgON60_SLDaV7S1MQ 
+    

@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "seed:superadmin": "node scripts/seedSuperAdmin.js"
+    "seed:superadmin": "node scripts/seedSuperAdmin.js",
+    "seed:tickettemplates": "node scripts/seedTicketTemplates.js"
   },
   "dependencies": {
     "axios": "^1.12.2",
@@ -23,6 +24,9 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.9",
+    "pdf-parse": "^2.4.5",
+    "puppeteer": "^24.34.0",
+    "tesseract.js": "^7.0.0",
     "twilio": "^5.10.6"
   }
 }

@@ -1,0 +1,3 @@
+PDF_DIAGNOSTIC: type = object
+PDF_DIAGNOSTIC: keys = ["AbortException","FormatError","InvalidPDFException","Line","LineDirection","LineStore","PDFParse","PasswordException","Point","Rectangle","ResponseException","Shape","Table","UnknownErrorException","VerbosityLevel","getException"]
+PDF_DIAGNOSTIC: default type = undefined

@@ -48,8 +48,8 @@ export async function getAgency(req, res, next) {
 
 export async function updateAgency(req, res, next) {
   try {
-    const { name, address, phone } = req.body;
-    const agency = await Agency.findByIdAndUpdate(req.params.id, { name, address, phone }, { new: true });
+    const { name, address, code, phone } = req.body;
+    const agency = await Agency.findByIdAndUpdate(req.params.id, { name, address, code, phone }, { new: true });
     if (!agency) return res.status(404).json({ message: 'Agency not found' });
     res.json(agency);
   } catch (err) { next(err); }

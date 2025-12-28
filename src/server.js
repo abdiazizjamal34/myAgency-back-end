@@ -12,7 +12,9 @@ import reportRoutes from './routes/report.routes.js';
 import errorHandler from './utils/errorHandler.js';
 import path from 'path';
 import notificationRoutes from './routes/notification.routes.js';
-
+import agencyTicketRoutes from './routes/agencyTicket.routes.js' 
+import ticketTemplatesRoutes from './routes/ticketTemplates.routes.js'
+import ticketsRoutes from './routes/tickets.routes.js'
 dotenv.config();
 const app = express();
 
@@ -31,6 +33,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/reports', reportRoutes);
 app.use("/api/notifications", notificationRoutes);
+
+// Tickt templets 
+app.use('/api/agency-ticket', agencyTicketRoutes);
+app.use('/api/ticket-templates', ticketTemplatesRoutes);
+app.use('/api/tickets', ticketsRoutes);
 
 
 app.use('/uploads', express.static(path.resolve('uploads')));
