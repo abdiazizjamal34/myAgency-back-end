@@ -3,7 +3,7 @@ import { auth } from '../middleware/auth.js';
 import { requireRole } from '../middleware/roles.js';
 import { ROLES } from '../utils/constants.js';
 import { body } from 'express-validator';
-import { createUser, listUsers, updateUser, deleteUser } from '../controllers/user.controller.js';
+import { createUser, listUsers, updateUser, deleteUser, updateProfile } from '../controllers/user.controller.js';
 import { changePassword } from '../controllers/auth.controller.js';
 
 
@@ -19,11 +19,18 @@ router.post('/', requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN), [
 ], createUser);
 
 router.get('/', requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN), listUsers);
+
+// allow authenticated user to update their own profile
+router.patch('/profile', updateProfile);
+
 router.patch('/:id', requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN), updateUser);
 router.delete('/:id', requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN), deleteUser);
+
 // allow admins to reset another user's password
 router.post('/:id/change-password', requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN), changePassword);
+
 // allow authenticated user to change their own password
 router.post('/change-password', changePassword);
 
 export default router;
+

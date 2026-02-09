@@ -160,22 +160,42 @@ export async function listUsers(req, res, next) {
 export async function updateUser(req, res, next) {
   try {
     const { id } = req.params;
-    const update = (({ name, role, isActive }) => ({ name, role, isActive }))(req.body);
-    // prevent role escalation
-    if (update.role === ROLES.SUPER_ADMIN && req.user.role !== ROLES.SUPER_ADMIN) {
-      return res.status(403).json({ message: 'Cannot elevate to SUPER_ADMIN' });
+    const body = req.body;
+
+    // Prepare update object
+    const update = {};
+    if (body.name) update.name = body.name;
+    if (body.isActive !== undefined) update.isActive = body.isActive;
+
+    if (body.role) {
+      if (!Object.values(ROLES).includes(body.role)) {
+        return res.status(400).json({
+          message: `Invalid role: ${body.role}. Valid roles are: ${Object.values(ROLES).join(', ')}`
+        });
+      }
+      // prevent role escalation
+      if (body.role === ROLES.SUPER_ADMIN && req.user.role !== ROLES.SUPER_ADMIN) {
+        return res.status(403).json({ message: 'Cannot elevate to SUPER_ADMIN' });
+      }
+      update.role = body.role;
     }
+
     let user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found' });
+
     if (req.user.role !== ROLES.SUPER_ADMIN && user.agency?.toString() !== req.user.agency?.toString()) {
       return res.status(403).json({ message: 'Cross-agency modification denied' });
     }
+
     user.set(update);
     await user.save();
-    const data = user.toObject(); delete data.password;
+
+    const data = user.toObject();
+    delete data.password;
     res.json(data);
   } catch (err) { next(err); }
 }
+
 
 export async function deleteUser(req, res, next) {
   try {
@@ -190,3 +210,31 @@ export async function deleteUser(req, res, next) {
   } catch (err) { next(err); }
 }
 
+
+export async function updateProfile(req, res, next) {
+  try {
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({ message: "Name is required" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.name = name;
+    await user.save();
+
+    const data = user.toObject();
+    delete data.password;
+
+    res.json({
+      message: "Profile updated successfully",
+      user: data,
+    });
+  } catch (err) {
+    console.error("updateProfile error:", err);
+    next(err);
+  }
+}
