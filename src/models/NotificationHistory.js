@@ -11,14 +11,14 @@ const NotificationHistorySchema = new mongoose.Schema(
     recipients: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        channel: { type: String, enum: ["email", "whatsapp", "both"] },
+        channel: { type: String, enum: ["email", "whatsapp", "both", "pop"] },
         status: { type: String, enum: ["sent", "failed"], default: "sent" },
       },
     ],
 
     channel: {
       type: String,
-      enum: ["email", "whatsapp", "both"],
+      enum: ["email", "whatsapp", "both", "pop"],
       required: true,
     },
 

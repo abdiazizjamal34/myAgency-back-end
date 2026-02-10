@@ -6,6 +6,12 @@ import { sendGenericEmail } from "./mailer.js";
 export async function sendMessageToUser(user, { channel, subject, text }) {
   const target = channel || "whatsapp"; // default to whatsapp
 
+  if (target === "pop") {
+    // Potentially add in-app broadcast logic here later
+    return;
+  }
+
+
   // WhatsApp notification
   if ((target === "whatsapp" || target === "both") && user.phone) {
     await sendWhatsAppText(user.phone, text);
