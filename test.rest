@@ -1,13 +1,13 @@
 ####  login
 
 POST http://localhost:4000/api/auth/login
-#  POST  http://3.88.179.134/api/auth/login
+# POST https://3.88.179.134/api/auth/login
  Content-Type: application/json
 
- {
-    "email" : "superadmin@example.com",
-    "password" : "SuperStrongPassword123!"
- }
+#  {
+#     "email" : "superadmin@example.com",
+#     "password" : "SuperStrongPassword123!"
+#  }
 
 
 #  {
@@ -15,20 +15,45 @@ POST http://localhost:4000/api/auth/login
 #     "password" : "123456"
 #  }
 
-# {
-#   "email": "abdiaziz.jamal3414@gmail.com",
-#   "password": "12345678"
-# }
+{
+  "email": "abdiaziz.jamal3414@gmail.com",
+  "password": "123456"
+}
 
 # {
 #   "email": "ahmedto1074@gmail.com",
 #   "password": "lacaso3414"
+
+  wow this is amazing the name of abdiaZi is qa
 # }
 
 # {
 #   "email": "aabiabdilahi@gmail.com",
 #   "password": "123456"
 # }
+
+
+### register new user
+POST http://localhost:4000/api/users/register
+Content-Type: application/json
+
+{
+  "name": "Abdiaziz Jams",
+  "email": "abdiaziz.jamal3414@gmail.com",
+  "password": "123456",
+  "role": "AGENCY_ADMIN",
+  "agency": "68b036b767c18d76193e7b91"
+}
+
+### update the user
+# patch http://localhost:4000/api/users/profile
+patch  https://3.88.179.134/api/users/profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZjcxZWMxNmZmNDk0NjQ0ZiIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc3MDYzNzE0MiwiZXhwIjoxNzcwNzIzNTQyfQ.pLmdHWlht6y9hKO3gfl5Jl9ph7MTTomU93GrsyTgBbo
+
+{
+  "name": "Abdiaziz Jams"
+}
 
 
 ###
@@ -406,3 +431,11 @@ POST http://localhost:4000/api/tickets/694fc3fa68c576eb790de815/render
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YjdmNzRiYzMyNGEwODhmNmI2ZGZlNCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc2NjgxOTI2MiwiZXhwIjoxNzY3NDI0MDYyfQ.m8Av-sI-qChI3d9Cw0P9gpsMG-wgON60_SLDaV7S1MQ 
     
+### get the ticket info
+GET http://localhost:4000/api/tickets/696ce5c41aa3d01c69f7955a/data
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZjcxZWMxNmZmNDk0NjQ0ZiIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2ODc0NDM3MiwiZXhwIjoxNzY5MzQ5MTcyfQ.LUv__aOINLWQ0UwUAqmWOALgH_1k5BF4bxzzmgNEpRA
+
+### get agency tickets
+GET http://localhost:4000/api/tickets/agency/68f52a59e7d487337ed2c78f
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZjcxZWMxNmZmNDk0NjQ0ZiIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2ODkwMTQwOSwiZXhwIjoxNzY5NTA2MjA5fQ.CJ6YLtE4TNRyJ5WxqwGzjAtj3UwzoR6h1IcSzHnhyAU
+

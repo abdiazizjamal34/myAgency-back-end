@@ -33,17 +33,20 @@ function findNoteValue(notes = [], prefix = "") {
   return n.slice(idx + 1).trim();
 }
 
-// Passengers list comes from notes like: "Passengers: A, B, C"
+// Passengers list comes from notes like: "Passengers: A, B, C" or "A; B; C"
 function parsePassengersFromNotes(notes = []) {
   const s = findNoteValue(notes, "Passengers");
   if (!s) return [];
-  return s.split(",").map(x => x.trim()).filter(Boolean);
+  if (s.includes(";")) return s.split(";").map(x => x.trim()).filter(Boolean);
+  // Fallback split on comma NOT followed by space (handles Last, First)
+  return s.split(/,(?!\s)/).map(x => x.trim()).filter(Boolean);
 }
 
 // eTickets list comes from notes like: "eTickets: 071..., 071..."
 function parseEticketsFromNotes(notes = []) {
   const s = findNoteValue(notes, "eTickets");
   if (!s) return [];
+  if (s.includes(";")) return s.split(";").map(x => x.trim()).filter(Boolean);
   return s.split(",").map(x => x.trim()).filter(Boolean);
 }
 
@@ -65,8 +68,8 @@ function inlineLogoDataUrl(logoUrl = "") {
       const ext = path.extname(abs).toLowerCase().replace(".", "");
       const mime =
         ext === "png" ? "image/png" :
-        ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
-        ext === "webp" ? "image/webp" : "application/octet-stream";
+          ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
+            ext === "webp" ? "image/webp" : "application/octet-stream";
 
       const buf = fs.readFileSync(abs);
       return `data:${mime};base64,${buf.toString("base64")}`;
@@ -102,16 +105,7 @@ export function buildAfroTicketHtml({ ticketDoc, template }) {
     || ticketDoc.processingStatus
     || "UNKNOWN";
 
-  const passengerNames =
-    parsePassengersFromNotes(notes).length
-      ? parsePassengersFromNotes(notes)
-      : (ticketDoc.passenger?.fullName ? [ticketDoc.passenger.fullName] : []);
-
-  const ticketNumbers =
-    parseEticketsFromNotes(notes).length
-      ? parseEticketsFromNotes(notes)
-      : (ticket.ticketNumber ? [ticket.ticketNumber] : []);
-
+  const passengers = Array.isArray(ticketDoc.passengers) ? ticketDoc.passengers : [];
   const cabinDefault = itinerary[0]?.cabin || "";
 
   // Logo (inline base64 if local)
@@ -119,13 +113,12 @@ export function buildAfroTicketHtml({ ticketDoc, template }) {
 
   const issueDate = ticketDoc.createdAt ? new Date(ticketDoc.createdAt).toISOString().slice(0, 10) : "";
 
-  const passengersRows = passengerNames.map((name, idx) => {
-    const tno = ticketNumbers[idx] || ticketNumbers[0] || "";
+  const passengersRows = passengers.map((p) => {
     return `
       <tr>
-        <td><strong>${esc(name)}</strong></td>
-        <td>${esc(tno)}</td>
-        <td>${esc(cabinDefault)}</td>
+        <td><strong>${esc(p.fullName)}</strong></td>
+        <td>${esc(p.ticketNumber || "-")}</td>
+        <td>${esc(p.type || cabinDefault)}</td>
       </tr>
     `;
   }).join("");

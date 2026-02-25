@@ -36,6 +36,17 @@ const FareBreakdownSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const PassengerSchema = new mongoose.Schema(
+  {
+    fullName: { type: String, default: "" },
+    type: { type: String, enum: ["ADT", "CHD", "INF", "ADULT", "CHILD", "INFANT", "UNKNOWN"], default: "UNKNOWN" },
+    ticketNumber: { type: String, default: "" },
+    passportNumber: { type: String, default: "" },
+    nationality: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
 const TicketDocumentSchema = new mongoose.Schema(
   {
     agencyId: {
@@ -57,7 +68,7 @@ const TicketDocumentSchema = new mongoose.Schema(
 
     source: {
       fileType: { type: String, enum: ["PDF", "JPG", "PNG"], required: true },
-      fileUrl: { type: String, required: true },
+      fileUrl: { type: String, required: false, default: "" },
 
       rawTextStored: { type: Boolean, default: false },
       rawText: { type: String, default: "" }, // optional storage
@@ -72,7 +83,6 @@ const TicketDocumentSchema = new mongoose.Schema(
     },
 
     ticket: {
-      ticketNumber: { type: String, default: "" }, // string (keep leading zeros)
       pnr: { type: String, default: "" },
       issueDate: { type: String, default: "" },    // "YYYY-MM-DD" or ISO
 
@@ -84,12 +94,7 @@ const TicketDocumentSchema = new mongoose.Schema(
       },
     },
 
-    passenger: {
-      fullName: { type: String, default: "" },
-      type: { type: String, enum: ["ADT", "CHD", "INF", "UNKNOWN"], default: "UNKNOWN" },
-      passportNumber: { type: String, default: "" },
-      nationality: { type: String, default: "" },
-    },
+    passengers: { type: [PassengerSchema], default: [] },
 
     itinerary: { type: [SegmentSchema], default: [] },
 

@@ -33,7 +33,13 @@ export async function createAgency(req, res, next) {
 
 export async function listAgencies(req, res, next) {
   try {
-    const agencies = await Agency.find().sort({ createdAt: -1 });
+    const isSuperAdmin = req.user?.role === ROLES.SUPER_ADMIN;
+    if (!isSuperAdmin && !req.user?.agency) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    const query = isSuperAdmin ? {} : { _id: req.user.agency };
+    const agencies = await Agency.find(query).sort({ createdAt: -1 });
     res.json(agencies);
   } catch (err) { next(err); }
 }
@@ -42,6 +48,9 @@ export async function getAgency(req, res, next) {
   try {
     const agency = await Agency.findById(req.params.id);
     if (!agency) return res.status(404).json({ message: 'Agency not found' });
+    if (req.user?.role !== ROLES.SUPER_ADMIN && String(req.user?.agency) !== String(agency._id)) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
     res.json(agency);
   } catch (err) { next(err); }
 }
@@ -49,14 +58,23 @@ export async function getAgency(req, res, next) {
 export async function updateAgency(req, res, next) {
   try {
     const { name, address, code, phone } = req.body;
-    const agency = await Agency.findByIdAndUpdate(req.params.id, { name, address, code, phone }, { new: true });
+    const agency = await Agency.findById(req.params.id);
     if (!agency) return res.status(404).json({ message: 'Agency not found' });
+    if (req.user?.role !== ROLES.SUPER_ADMIN && String(req.user?.agency) !== String(agency._id)) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    agency.set({ name, address, code, phone });
+    await agency.save();
     res.json(agency);
   } catch (err) { next(err); }
 }
 
 export async function deleteAgency(req, res, next) {
   try {
+    if (req.user?.role !== ROLES.SUPER_ADMIN) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
     const agency = await Agency.findByIdAndDelete(req.params.id);
     if (!agency) return res.status(404).json({ message: 'Agency not found' });
     await User.deleteMany({ agency: agency._id });
@@ -95,6 +113,34 @@ export async function uploadAgencyLogoHandler(req, res, next) {
 
     if (!req.file) return res.status(400).json({ message: 'Logo file is required' });
 
+    // validate logo file type and size
+    const allowedLogoMimeTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/svg+xml',
+      'image/webp',
+    ];
+    const maxLogoSizeBytes = 2 * 1024 * 1024; // 2MB
+
+    if (!allowedLogoMimeTypes.includes(req.file.mimetype)) {
+      if (req.file.path) {
+        try { if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path); } catch (e) { /* ignore */ }
+      }
+      return res
+        .status(400)
+        .json({ message: 'Invalid logo file type. Allowed types are PNG, JPEG, SVG, and WEBP.' });
+    }
+
+    if (typeof req.file.size === 'number' && req.file.size > maxLogoSizeBytes) {
+      if (req.file.path) {
+        try { if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path); } catch (e) { /* ignore */ }
+      }
+      return res
+        .status(413)
+        .json({ message: 'Logo file is too large. Maximum size is 2MB.' });
+    }
+
     // remove old local file if present
     if (agency.logo && agency.logo.startsWith('/uploads/')) {
       const oldPath = path.resolve('.', agency.logo.slice(1));
@@ -116,11 +162,38 @@ export async function getAgencyLogo(req, res, next) {
     if (!agency) return res.status(404).json({ message: 'Agency not found' });
     if (!agency.logo) return res.status(404).json({ message: 'Logo not found' });
 
-    // If logo is absolute URL (http/https) redirect there, otherwise redirect to relative path
-    if (/^https?:\/\//i.test(agency.logo)) {
-      return res.redirect(agency.logo);
+    // If logo is absolute URL (http/https) only allow redirects to whitelisted hosts.
+    // Otherwise treat as relative path and let static middleware serve it.
+    const { logo } = agency;
+    const isAbsoluteUrl = /^https?:\/\//i.test(logo);
+
+    if (isAbsoluteUrl) {
+      let url;
+      try {
+        url = new URL(logo, `${req.protocol}://${req.get('host')}`);
+      } catch (e) {
+        return res.status(400).json({ message: 'Invalid logo URL' });
+      }
+
+      const allowedLogoHosts = (process.env.AGENCY_LOGO_ALLOWED_HOSTS || '')
+        .split(',')
+        .map((h) => h.trim())
+        .filter(Boolean);
+
+      const isAllowed =
+        allowedLogoHosts.length === 0
+          ? false
+          : allowedLogoHosts.includes(url.hostname);
+
+      if (!isAllowed) {
+        return res.status(400).json({ message: 'Logo host not allowed' });
+      }
+
+      return res.redirect(url.toString());
     }
-    return res.redirect(agency.logo); // e.g. "/uploads/agencies/xxx.png" served by static middleware
+
+    // Relative path, e.g. "/uploads/agencies/xxx.png" served by static middleware
+    return res.redirect(logo);
   } catch (err) {
     next(err);
   }

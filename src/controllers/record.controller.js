@@ -1,8 +1,13 @@
 import Record from '../models/Record.js';
 import { ROLES } from '../utils/constants.js';
 import { validationResult } from 'express-validator';
+import { incrementRecordUsage } from "../services/usage.service.js";
+
+
+
 
 import dayjs from 'dayjs';
+import Usage from '../models/Usage.js';
 
 function scope(req) {
   const query = {};
@@ -55,7 +60,18 @@ export async function createRecord(req, res, next) {
     };
 
     const record = await Record.create(data);
-    res.status(201).json(record);
+
+    console.log("✅ Record created", { id: record._id, agency });
+
+    // increment monthly usage counter (for pay-per-record billing)
+    const usageDoc = await incrementRecordUsage({ agencyId: agency, at: record.createdAt });
+    console.log("✅ Usage doc", usageDoc?.toObject ? usageDoc.toObject() : usageDoc);
+
+    res.status(201).json({
+      record,
+      usage: usageDoc,
+      billing: req.billing || { status: "ok" }
+    });
   } catch (err) { next(err); }
 }
 
@@ -69,13 +85,13 @@ export async function listRecords(req, res, next) {
     // Daily filter (example: ?day=2025-08-28)
     if (day) {
       from = dayjs(day).startOf('day').toDate();
-      to   = dayjs(day).endOf('day').toDate();
+      to = dayjs(day).endOf('day').toDate();
     }
 
     // Monthly filter (example: ?month=2025-08)
     if (month) {
       from = dayjs(month + "-01").startOf('month').toDate();
-      to   = dayjs(month + "-01").endOf('month').toDate();
+      to = dayjs(month + "-01").endOf('month').toDate();
     }
 
     if (from || to) {
@@ -112,7 +128,7 @@ export async function updateRecord(req, res, next) {
     // allow updates to new fields as well
     ['customerName', 'typeOfService', 'subService', 'sellingPrice', 'buyingPrice', 'expenses', 'notes', 'paymentMethod', 'service', 'consultants', 'fromTo', 'ticketNumber'].forEach(k => {
       if (req.body[k] !== undefined) {
-        if (['sellingPrice','buyingPrice','expenses'].includes(k)) {
+        if (['sellingPrice', 'buyingPrice', 'expenses'].includes(k)) {
           record[k] = Number(req.body[k]) || 0;
         } else {
           record[k] = req.body[k];

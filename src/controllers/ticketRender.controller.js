@@ -12,7 +12,7 @@ export async function renderTicket(req, res) {
         if (!ticketDoc) return res.status(404).json({ message: "Ticket not found" });
 
         const tpl = (await TicketTemplate.findOne({ agencyId })) || { agencyId };
-       const html = buildAfroTicketHtml({ ticketDoc, template: tpl });
+        const html = buildAfroTicketHtml({ ticketDoc, template: tpl });
 
         const fileBase = `${ticketDoc.ticket?.pnr || "PNR"}_${ticketDoc.passenger?.fullName || "Passenger"}`;
         const format = tpl?.theme?.paper || "A4";
@@ -43,6 +43,28 @@ export async function getRendered(req, res) {
             data: {
                 pdfUrl: ticketDoc.rendered?.pdfUrl || "",
                 renderedAt: ticketDoc.rendered?.renderedAt || null,
+            },
+        });
+    } catch (e) {
+        return res.status(500).json({ message: "Failed", error: e.message });
+    }
+}
+
+export async function getTicketData(req, res) {
+    try {
+        const agencyId = req.user.agency;
+        const ticketId = req.params.id;
+
+        const ticketDoc = await TicketDocument.findOne({ _id: ticketId, agencyId });
+        if (!ticketDoc) return res.status(404).json({ message: "Ticket not found" });
+
+        const tpl = (await TicketTemplate.findOne({ agencyId })) || { agencyId };
+
+        return res.json({
+            message: "Success",
+            data: {
+                ticket: ticketDoc,
+                template: tpl,
             },
         });
     } catch (e) {

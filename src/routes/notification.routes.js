@@ -22,13 +22,35 @@ router.post("/broadcast", broadcastMessage);
 router.post("/agency", notifyAgency);
 
 router.get("/history", async (req, res) => {
-  const history = await NotificationHistory.find()
-    .populate("sender", "name email")
-    .populate("recipients.user", "name email phone")
-    .populate("agency", "name code")
-    .sort({ createdAt: -1 });
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
 
-  res.json(history);
+    const [history, total] = await Promise.all([
+      NotificationHistory.find()
+        .populate("sender", "name email")
+        .populate("recipients.user", "name email phone")
+        .populate("agency", "name code")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      NotificationHistory.countDocuments(),
+    ]);
+    /// pagination 
+    res.json({
+      data: history,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch notification history", error: err.message });
+  }
 });
 
 export default router;

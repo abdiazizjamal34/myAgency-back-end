@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function sendMail({ to, subject, html, text }) {
+export async function sendMail({ to, subject, html, text }) {
   const mailOptions = {
     from: `"Agency System" <${process.env.SMTP_USER}>`,
     to,

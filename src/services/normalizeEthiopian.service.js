@@ -347,38 +347,41 @@ export function normalizeEthiopian(rawText) {
 
   const seatLines = extractSeatLines(text);
 
-  // REQUIRED: PNR + passenger + at least 1 segment
-  const needsReview = !(pnr && primaryPassenger && itinerary.length);
+  // Create passengers array
+  const paxArray = passengers.map((name, idx) => ({
+    fullName: name,
+    type: name.includes("(Child)") ? "CHILD" : "ADULT",
+    ticketNumber: etickets[idx] || (idx === 0 ? (etickets[0] || "") : ""),
+    passportNumber: "",
+    nationality: "",
+  }));
+
+  // REQUIRED: PNR + at least 1 passenger + at least 1 segment
+  const needsReview = !(pnr && paxArray.length && itinerary.length);
 
   return {
     normalized: {
       airline,
       ticket: {
-        ticketNumber: etickets[0] || "", // store first eTicket here for now
         pnr,
         issueDate: "",
         issuingOffice: "",
         status: "UNKNOWN",
       },
-      passenger: {
-        fullName: primaryPassenger,
-        type: "UNKNOWN",
-        passportNumber: "",
-        nationality: "",
-      },
+      passengers: paxArray,
       itinerary,
       fare: { currency: "", base: 0, taxes: 0, total: 0, breakdown: [] },
       notes: [
         ...(status ? [`Booking Status: ${status}`] : []),
-        ...(passengers.length > 1 ? [`Passengers: ${passengers.join(", ")}`] : []),
-        ...(etickets.length > 1 ? [`eTickets: ${etickets.join(", ")}`] : []),
+        ...(passengers.length > 1 ? [`Passengers: ${passengers.join("; ")}`] : []),
+        ...(etickets.length > 1 ? [`eTickets: ${etickets.join("; ")}`] : []),
         ...(seatLines.length ? [`Seats: ${seatLines.join(", ")}`] : []),
       ],
     },
     confidence: Math.min(
       1,
       (pnr ? 0.35 : 0) +
-      (primaryPassenger ? 0.25 : 0) +
+      (paxArray.length ? 0.25 : 0) +
       (itinerary.length ? 0.25 : 0) +
       (etickets.length ? 0.15 : 0)
     ),

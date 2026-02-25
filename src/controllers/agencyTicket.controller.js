@@ -3,27 +3,45 @@ import AgencyBranding from '../models/AgencyBranding.js';
 import AgencySettings from '../models/AgencySettings.js';
 import TicketTemplate from '../models/TicketTemplate.js';
 
+const parseBooleanField = (value) => {
+  if (typeof value === 'boolean') return value;
+
+  if (typeof value === 'number') {
+    if (value === 1) return true;
+    if (value === 0) return false;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes', 'y'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'n'].includes(normalized)) return false;
+  }
+
+  return value;
+};
+
 /** GET /api/agency-ticket/branding */
 export const getTicketBranding = async (req, res) => {
   try {
-    const agencyId = req.user.agencyId;
+    const { agencyId } = req.user;
 
-    let branding = await AgencyBranding.findOne({ agencyId }).lean();
-    if (!branding) {
-      const created = await AgencyBranding.create({ agencyId });
-      branding = created.toObject();
-    }
+    const branding = await AgencyBranding.findOneAndUpdate(
+      { agencyId },
+      { $setOnInsert: { agencyId } },
+      { new: true, upsert: true, lean: true }
+    );
 
     res.json({ data: branding });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to get branding', error: err.message });
+    console.error('Failed to get branding', err);
+    res.status(500).json({ message: 'Failed to get branding' });
   }
 };
 
 /** PUT /api/agency-ticket/branding */
 export const updateTicketBranding = async (req, res) => {
   try {
-    const agencyId = req.user.agencyId;
+    const { agencyId } = req.user;
 
     const allowed = [
       'logoUrl',
@@ -50,14 +68,15 @@ export const updateTicketBranding = async (req, res) => {
 
     res.json({ message: 'Branding saved', data: branding });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update branding', error: err.message });
+    console.error('Failed to update branding', err);
+    res.status(500).json({ message: 'Failed to update branding' });
   }
 };
 
 /** GET /api/agency-ticket/settings */
 export const getTicketSettings = async (req, res) => {
   try {
-    const agencyId = req.user.agencyId;
+    const { agencyId } = req.user;
 
     let settings = await AgencySettings.findOne({ agencyId })
       .populate('ticketTemplateId')
@@ -87,21 +106,22 @@ export const getTicketSettings = async (req, res) => {
 
     res.json({ data: settings });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to get settings', error: err.message });
+    console.error('Failed to get settings', err);
+    res.status(500).json({ message: 'Failed to get settings' });
   }
 };
 
 /** PUT /api/agency-ticket/settings */
 export const updateTicketSettings = async (req, res) => {
   try {
-    const agencyId = req.user.agencyId;
+    const { agencyId } = req.user;
     const { ticketTemplateId, showFare, showBaggage, showNotes } = req.body;
 
     const patch = {};
     if (ticketTemplateId !== undefined) patch.ticketTemplateId = ticketTemplateId;
-    if (showFare !== undefined) patch.showFare = !!showFare;
-    if (showBaggage !== undefined) patch.showBaggage = !!showBaggage;
-    if (showNotes !== undefined) patch.showNotes = !!showNotes;
+    if (showFare !== undefined) patch.showFare = parseBooleanField(showFare);
+    if (showBaggage !== undefined) patch.showBaggage = parseBooleanField(showBaggage);
+    if (showNotes !== undefined) patch.showNotes = parseBooleanField(showNotes);
 
     // Validate template choice
     if (patch.ticketTemplateId) {
@@ -123,6 +143,7 @@ export const updateTicketSettings = async (req, res) => {
 
     res.json({ message: 'Settings saved', data: settings });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update settings', error: err.message });
+    console.error('Failed to update settings', err);
+    res.status(500).json({ message: 'Failed to update settings' });
   }
 };

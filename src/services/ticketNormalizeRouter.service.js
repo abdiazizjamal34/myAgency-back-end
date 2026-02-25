@@ -3,7 +3,7 @@ import { normalizeTravelport } from "./normalizeTravelport.service.js";
 
 function isTravelport(text) {
     const up = (text || "").toUpperCase();
-    return up.includes("TRAVELPORT") && up.includes("VIEWTRIP") && up.includes();
+    return up.includes("TRAVELPORT") || up.includes("VIEWTRIP") || up.includes("RESERVATION OVERVIEW");
 }
 
 export function normalizeTicket(rawText) {
