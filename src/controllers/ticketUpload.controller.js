@@ -1,7 +1,7 @@
 // src/controllers/ticketUpload.controller.js
 import TicketDocument from '../models/TicketDocument.js';
 import { extractRawTextFromFile } from '../services/ticketExtraction.service.js';
-import { normalizeTicket } from '../services/ticketNormalizeRouter.service.js';
+import { normalizeTicketSchema } from '../services/ticketNormalizationOrchestrator.service.js';
 
 import path from 'path';
 // NOTE: In Phase 2 MVP we do extraction in-process (works fine for low volume)
@@ -51,8 +51,8 @@ export const uploadTicket = async (req, res) => {
       });
     }
 
-    // 4) Normalize
-    const { normalized, confidence, processingStatus } = normalizeTicket(rawText);
+    // 4) Normalize via Orchestrator
+    const result = await normalizeTicketSchema(rawText);
 
     // 5) Update document
     const updated = await TicketDocument.findByIdAndUpdate(
@@ -61,14 +61,17 @@ export const uploadTicket = async (req, res) => {
         $set: {
           'source.rawTextStored': true,
           'source.rawText': rawText,
-          'source.extractionConfidence': confidence,
-          airline: normalized.airline,
-          ticket: normalized.ticket,
-          passengers: normalized.passengers,
-          itinerary: normalized.itinerary,
-          fare: normalized.fare,
-          notes: normalized.notes,
-          processingStatus,
+          'source.extractionConfidence': result.normalizationMeta.confidence,
+
+          airline: result.normalized.airline,
+          ticket: result.normalized.ticket,
+          passengers: result.normalized.passengers,
+          itinerary: result.normalized.itinerary,
+          fare: result.normalized.fare,
+          notes: result.normalized.notes,
+
+          normalization: result.normalizationMeta,
+          processingStatus: result.processingStatus,
         },
       },
       { new: true }
@@ -91,27 +94,31 @@ export const uploadTicket = async (req, res) => {
 
 export const reprocessTicket = async (req, res) => {
   try {
-    const agencyId = req.user.agencyId;
+    const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
+    const agencyId = req.user.agency;
     const { id } = req.params;
 
-    const ticket = await TicketDocument.findOne({ _id: id, agencyId });
+    const filter = isSuperAdmin ? { _id: id } : { _id: id, agencyId };
+    const ticket = await TicketDocument.findOne(filter);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
     const rawText = ticket?.source?.rawText || '';
-    const { normalized, confidence, processingStatus } = normalizeTicket(rawText);
+    const result = await normalizeTicketSchema(rawText);
 
     const updated = await TicketDocument.findByIdAndUpdate(
       ticket._id,
       {
         $set: {
-          'source.extractionConfidence': confidence,
-          airline: normalized.airline,
-          ticket: normalized.ticket,
-          passengers: normalized.passengers,
-          itinerary: normalized.itinerary,
-          fare: normalized.fare,
-          notes: normalized.notes,
-          processingStatus,
+          'source.extractionConfidence': result.normalizationMeta.confidence,
+          airline: result.normalized.airline,
+          ticket: result.normalized.ticket,
+          passengers: result.normalized.passengers,
+          itinerary: result.normalized.itinerary,
+          fare: result.normalized.fare,
+          notes: result.normalized.notes,
+
+          normalization: result.normalizationMeta,
+          processingStatus: result.processingStatus,
         },
       },
       { new: true }

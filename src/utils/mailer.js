@@ -73,18 +73,7 @@ export async function sendPasswordChangedEmail(to, name = "") {
   return sendMail({ to, subject, html, text: "Your password was changed. If you did not do this, contact support." });
 }
 
-// Generic email sender for notifications / bulk messages
 export async function sendGenericEmail(to, subject, text) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
   const mailOptions = {
     from: `"Agency System" <${process.env.SMTP_USER}>`,
     to,
@@ -94,4 +83,66 @@ export async function sendGenericEmail(to, subject, text) {
 
   await transporter.sendMail(mailOptions);
   console.log(`📧 Notification email sent to ${to}`);
+}
+
+export async function sendTicketEmail(to, subject, data, pdf, pdfName) {
+  const html = loadTemplate("ticketEmail", {
+    agencyName: data.agencyName || "Afro Trip Express",
+    logoTag: data.logoUrl ? `<img src="${data.logoUrl}" alt="Logo" style="max-height: 50px; margin-bottom: 10px;"/>` : "",
+    primaryColor: data.primaryColor || "#004d40",
+    passengerName: data.passengerName ? ` ${data.passengerName}` : "",
+    messageBody: data.messageBody ? `<p>${data.messageBody}</p>` : "<p>Attached is your e-ticket and itinerary. Thank you for booking with us!</p>",
+    footerText: data.footerText || "",
+    year: new Date().getFullYear(),
+  });
+
+  const attachments = [];
+  // Accept either a file path (string) or an in-memory Buffer
+  if (pdf) {
+    if (typeof pdf === "string") {
+      attachments.push({ filename: pdfName || "ETicket.pdf", path: pdf });
+    } else if (Buffer.isBuffer(pdf)) {
+      attachments.push({ filename: pdfName || "ETicket.pdf", content: pdf });
+    }
+  }
+
+  const mailOptions = {
+    from: `"${data.agencyName || "Agency System"}" <${process.env.SMTP_USER}>`,
+    to,
+    subject,
+    html,
+    attachments,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Ticket Email sent to ${to}: ${info.messageId}`);
+    return info;
+  } catch (err) {
+    console.error(`❌ Error sending ticket email to ${to}:`, err.message);
+    throw err;
+  }
+}
+
+export async function sendCustomAttachmentEmail({ to, subject, html, attachments, from, replyTo }) {
+  const mailOptions = {
+    from: from || `"Agency System" <${process.env.SMTP_USER}>`,
+    to,
+    subject,
+    html,
+    attachments,
+  };
+  
+  if (replyTo) {
+    mailOptions.replyTo = replyTo;
+  }
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Custom Email sent to ${to}: ${info.messageId}`);
+    return info;
+  } catch (err) {
+    console.error(`❌ Error sending custom email to ${to}:`, err.message);
+    throw err;
+  }
 }

@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const AirportPointSchema = new mongoose.Schema(
   {
     city: { type: String, default: "" },
-    airport: { type: String, default: "" },   // "ADD", "DXB"
+    airport: { type: String, default: "" },   // full name if available
+    code: { type: String, default: "" },      // "ADD", "DXB"
     terminal: { type: String, default: "" },
   },
   { _id: false }
@@ -108,9 +109,19 @@ const TicketDocumentSchema = new mongoose.Schema(
 
     notes: { type: [String], default: [] },
 
+    normalization: {
+      version: { type: String, default: "v2-bot" },
+      rawText: { type: String, default: "" },
+      cleanedText: { type: String, default: "" },
+      confidence: { type: Number, default: 0 },
+      needsReview: { type: Boolean, default: false },
+      missingFields: { type: [String], default: [] },
+      warnings: { type: [String], default: [] }
+    },
+
     processingStatus: {
       type: String,
-      enum: ["UPLOADED", "EXTRACTED", "NORMALIZED", "NEEDS_REVIEW", "READY"],
+      enum: ["UPLOADED", "EXTRACTED", "NORMALIZED", "NEEDS_REVIEW", "READY", "RENDERED", "FAILED"],
       default: "UPLOADED",
       index: true,
     },

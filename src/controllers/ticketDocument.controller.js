@@ -119,11 +119,37 @@ export const getTicketDocument = async (req, res) => {
     const agencyId = req.user.agency;
     const { id } = req.params;
 
-    const ticket = await TicketDocument.findOne({ _id: id, agencyId }).lean();
+    let filter = { _id: id, agencyId };
+    if (req.user.role === ROLES.SUPER_ADMIN) {
+      filter = { _id: id };
+    }
+
+    const ticket = await TicketDocument.findOne(filter).lean();
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
     res.json({ data: ticket });
   } catch (err) {
     res.status(500).json({ message: 'Failed to get ticket', error: err.message });
+  }
+};
+
+/** DELETE /api/tickets/:id */
+export const deleteTicketDocument = async (req, res) => {
+  try {
+    const agencyId = req.user.agency;
+    const { id } = req.params;
+
+    // Must belong to the same agency (or could allow SUPER_ADMIN override if needed)
+    let filter = { _id: id, agencyId };
+    if (req.user.role === ROLES.SUPER_ADMIN) {
+      filter = { _id: id }; // Super admin can delete any ticket
+    }
+
+    const ticket = await TicketDocument.findOneAndDelete(filter);
+    if (!ticket) return res.status(404).json({ message: 'Ticket not found or unauthorized' });
+
+    res.json({ message: 'Ticket deleted successfully', data: ticket });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete ticket', error: err.message });
   }
 };

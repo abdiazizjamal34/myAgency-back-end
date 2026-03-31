@@ -17,14 +17,14 @@ POST http://localhost:4000/api/auth/login
 
 {
   "email": "abdiaziz.jamal3414@gmail.com",
-  "password": "123456"
+  "password": "12345678"
 }
 
 # {
 #   "email": "ahmedto1074@gmail.com",
 #   "password": "lacaso3414"
 
-  wow this is amazing the name of abdiaZi is qa
+
 # }
 
 # {
@@ -439,3 +439,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZ
 GET http://localhost:4000/api/tickets/agency/68f52a59e7d487337ed2c78f
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZjcxZWMxNmZmNDk0NjQ0ZiIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc2ODkwMTQwOSwiZXhwIjoxNzY5NTA2MjA5fQ.CJ6YLtE4TNRyJ5WxqwGzjAtj3UwzoR6h1IcSzHnhyAU
 
+
+### reprocess ticket
+POST http://localhost:4000/api/tickets/69b88ac6e6a9f3af3323e4d4/reprocess
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZjcxZWMxNmZmNDk0NjQ0ZiIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc3NDk2ODcxMiwiZXhwIjoxNzc1NTczNTEyfQ.Zf4cd_KjDEX382ET49C5ERiitaKxKohBPZ9nZaxkKK4
+
+### email ticket
+POST http://localhost:4000/api/tickets/69caa8244a4bb4f6b4817574/email
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZjcxZWMxNmZmNDk0NjQ0ZiIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc3NDk2ODcxMiwiZXhwIjoxNzc1NTczNTEyfQ.Zf4cd_KjDEX382ET49C5ERiitaKxKohBPZ9nZaxkKK4
+
+{
+    "email": "abdaziz.jamal3414@gmail.com",
+    "customMessage": "Here is your ticket for tomorrow's flight! Have a safe trip."
+}
+
+### get all tickets
+GET http://localhost:4000/api/tickets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjFkMTIyZjcxZWMxNmZmNDk0NjQ0ZiIsInJvbGUiOiJBR0VOQ1lfQURNSU4iLCJhZ2VuY3kiOnsiX2lkIjoiNjhmNTJhNTllN2Q0ODczMzdlZDJjNzhmIiwibmFtZSI6IkFGUk8gVHJpcCIsImNvZGUiOiJBRjM0In0sImlhdCI6MTc3NDk2ODcxMiwiZXhwIjoxNzc1NTczNTEyfQ.Zf4cd_KjDEX382ET49C5ERiitaKxKohBPZ9nZaxkKK4 

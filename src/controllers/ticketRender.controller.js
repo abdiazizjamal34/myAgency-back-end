@@ -8,10 +8,14 @@ export async function renderTicket(req, res) {
         const agencyId = req.user.agency;
         const ticketId = req.params.id;
 
-        const ticketDoc = await TicketDocument.findOne({ _id: ticketId, agencyId });
+        let filter = { _id: ticketId, agencyId };
+        if (req.user.role === "SUPER_ADMIN") filter = { _id: ticketId };
+
+        const ticketDoc = await TicketDocument.findOne(filter);
         if (!ticketDoc) return res.status(404).json({ message: "Ticket not found" });
 
-        const tpl = (await TicketTemplate.findOne({ agencyId })) || { agencyId };
+        const targetAgencyId = ticketDoc.agencyId || agencyId;
+        const tpl = (await TicketTemplate.findOne({ agencyId: targetAgencyId })) || { agencyId: targetAgencyId };
         const html = buildAfroTicketHtml({ ticketDoc, template: tpl });
 
         const fileBase = `${ticketDoc.ticket?.pnr || "PNR"}_${ticketDoc.passenger?.fullName || "Passenger"}`;
@@ -36,7 +40,10 @@ export async function getRendered(req, res) {
         const agencyId = req.user.agency;
         const ticketId = req.params.id;
 
-        const ticketDoc = await TicketDocument.findOne({ _id: ticketId, agencyId });
+        let filter = { _id: ticketId, agencyId };
+        if (req.user.role === "SUPER_ADMIN") filter = { _id: ticketId };
+
+        const ticketDoc = await TicketDocument.findOne(filter);
         if (!ticketDoc) return res.status(404).json({ message: "Ticket not found" });
 
         return res.json({
@@ -55,10 +62,14 @@ export async function getTicketData(req, res) {
         const agencyId = req.user.agency;
         const ticketId = req.params.id;
 
-        const ticketDoc = await TicketDocument.findOne({ _id: ticketId, agencyId });
+        let filter = { _id: ticketId, agencyId };
+        if (req.user.role === "SUPER_ADMIN") filter = { _id: ticketId };
+
+        const ticketDoc = await TicketDocument.findOne(filter);
         if (!ticketDoc) return res.status(404).json({ message: "Ticket not found" });
 
-        const tpl = (await TicketTemplate.findOne({ agencyId })) || { agencyId };
+        const targetAgencyId = ticketDoc.agencyId || agencyId;
+        const tpl = (await TicketTemplate.findOne({ agencyId: targetAgencyId })) || { agencyId: targetAgencyId };
 
         return res.json({
             message: "Success",
