@@ -15,8 +15,7 @@ import {
   deleteTicketDocument,
 } from '../controllers/ticketDocument.controller.js';
 
-import multer from 'multer';
-import { sendTicketViaEmail, sendTicketViaEmailInline, sendTicketViaEmailMultipart } from '../controllers/ticketEmail.controller.js';
+import { sendTicketViaEmail, sendTicketViaEmailInline } from '../controllers/ticketEmail.controller.js';
 
 const router = Router();
 router.use(auth);
@@ -31,13 +30,8 @@ router.get("/:id/data", requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN, ROLES
 // send ticket via email
 router.post("/:id/email", requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN, ROLES.PARTNER), sendTicketViaEmail);
 
-// send ticket via email directly taking a multipart form PDF from frontend
-const uploadMemory = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } });
-router.post("/:id/send-email", requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN, ROLES.PARTNER), uploadMemory.single("file"), sendTicketViaEmailMultipart);
-
 // send ticket via email with inline/base64 PDF (frontend provides base64 PDF, no saving)
 router.post("/:id/email-inline", requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN, ROLES.PARTNER), sendTicketViaEmailInline);
-
 
 // delete ticket
 router.delete('/:id', requireRole(ROLES.SUPER_ADMIN, ROLES.AGENCY_ADMIN, ROLES.PARTNER), deleteTicketDocument);

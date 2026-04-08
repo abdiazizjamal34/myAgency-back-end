@@ -13,8 +13,16 @@ function preprocessText(rawText) {
     return cleaned;
 }
 
+function getNormalizationVersionLabel() {
+    const provider = String(process.env.NORMALIZATION_PROVIDER || process.env.TICKET_NORMALIZATION_PROVIDER || 'gemini')
+        .trim()
+        .toLowerCase();
+    return `v2-bot-${provider}`;
+}
+
 export async function normalizeTicketSchema(rawText) {
     const cleanedText = preprocessText(rawText);
+    const versionLabel = getNormalizationVersionLabel();
 
     try {
         // Layer 2: LLM JSON Extraction
@@ -39,7 +47,7 @@ export async function normalizeTicketSchema(rawText) {
                 notes: validated.notes || []
             },
             normalizationMeta: {
-                version: "v2-bot-gemini-1.5-flash",
+                version: versionLabel,
                 rawText: rawText,
                 cleanedText: cleanedText,
                 confidence: validated.meta.confidence,
@@ -54,7 +62,7 @@ export async function normalizeTicketSchema(rawText) {
         return {
             normalized: { airline: {}, ticket: {}, passengers: [], itinerary: [], fare: { base: 0, taxes: 0, total: 0 }, notes: [] },
             normalizationMeta: {
-                version: "v2-bot-gemini-1.5-flash",
+                version: versionLabel,
                 rawText: rawText,
                 cleanedText: cleanedText,
                 confidence: 0,

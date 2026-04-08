@@ -123,26 +123,3 @@ export async function sendTicketEmail(to, subject, data, pdf, pdfName) {
     throw err;
   }
 }
-
-export async function sendCustomAttachmentEmail({ to, subject, html, attachments, from, replyTo }) {
-  const mailOptions = {
-    from: from || `"Agency System" <${process.env.SMTP_USER}>`,
-    to,
-    subject,
-    html,
-    attachments,
-  };
-  
-  if (replyTo) {
-    mailOptions.replyTo = replyTo;
-  }
-
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Custom Email sent to ${to}: ${info.messageId}`);
-    return info;
-  } catch (err) {
-    console.error(`❌ Error sending custom email to ${to}:`, err.message);
-    throw err;
-  }
-}
