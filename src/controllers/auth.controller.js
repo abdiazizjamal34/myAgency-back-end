@@ -277,7 +277,8 @@ export async function verifyOtp(req, res, next) {
 
     otpRecord.verified = true;
     const resetToken = crypto.randomBytes(32).toString('hex');
-    otpRecord.resetToken = resetToken;
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    otpRecord.resetToken = resetTokenHash;
     otpRecord.resetTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
     await otpRecord.save();
 
