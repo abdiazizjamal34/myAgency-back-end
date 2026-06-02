@@ -271,7 +271,7 @@ export async function verifyOtp(req, res, next) {
     });
 
     if (!otpRecord) {
-      console.error('OTP verify failed', { user: user._id.toString(), providedCode });
+      console.error('OTP verify failed', { user: user._id.toString() });
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
@@ -300,7 +300,12 @@ export async function resetPassword(req, res, next) {
 
     const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    const otpRecord = await Otp.findOne({
+    if (!mongoose.Types.ObjectId.isValid(userId) || typeof resetToken !== 'string' || !/^[a-f0-9]{64}$/.test(resetToken)) {
+      return res.status(400).json({ message: "Invalid or expired reset token" });
+    }
+
+    // Atomic consume: findOneAndDelete ensures only one concurrent request can use this token
+    const otpRecord = await Otp.findOneAndDelete({
       user: userId,
       resetToken: resetTokenHash,
       resetTokenExpiresAt: { $gt: new Date() },
@@ -311,7 +316,8 @@ export async function resetPassword(req, res, next) {
       return res.status(400).json({ message: "Invalid or expired reset token" });
     }
 
-    const user = await User.findById(userId);
+    // Use the DB-sourced user reference, not the attacker-controlled userId from req.body
+    const user = await User.findById(otpRecord.user);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -319,6 +325,7 @@ export async function resetPassword(req, res, next) {
     user.password = newPassword; // hashing handled by pre-save hook in User model
     await user.save();
 
+    // Delete any remaining OTPs (e.g. re-sent codes) for this user
     await Otp.deleteMany({ user: user._id });
 
     console.log(`🔑 Password reset successful for ${user.email}`);

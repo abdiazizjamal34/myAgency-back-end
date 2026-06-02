@@ -25,7 +25,7 @@ node --check src/server.js
 node --check src/**/*.js
 ```
 
-No test framework is configured.
+Tests: Vitest + mongodb-memory-server. Run `npm test`.
 
 ## Architecture
 

@@ -10,7 +10,8 @@
     "seed:superadmin": "node scripts/seedSuperAdmin.js",
     "seed:tickettemplates": "node scripts/seedTicketTemplates.js",
     "seed:plans": "node scripts/seedPlans.js",
-    "assign:defaultplan": "node scripts/assignDefaultPlan.js"
+    "assign:defaultplan": "node scripts/assignDefaultPlan.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@google/genai": "^1.45.0",
@@ -33,5 +34,9 @@
     "puppeteer": "^24.34.0",
     "tesseract.js": "^7.0.0",
     "twilio": "^5.10.6"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.2.0",
+    "vitest": "^4.1.8"
   }
 }
