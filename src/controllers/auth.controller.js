@@ -298,10 +298,13 @@ export async function resetPassword(req, res, next) {
       return res.status(400).json({ message: "userId, resetToken, and newPassword are required" });
     }
 
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+
     const otpRecord = await Otp.findOne({
       user: userId,
-      resetToken,
+      resetToken: resetTokenHash,
       resetTokenExpiresAt: { $gt: new Date() },
+      verified: true,
     });
 
     if (!otpRecord) {
