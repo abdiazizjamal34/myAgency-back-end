@@ -57,14 +57,6 @@ export function billingGuard() {
                 },
             };
 
-            // ✅ If read-only, block writes EXCEPT allowed payment/billing actions
-            if (readOnly && WRITE_METHODS.has(req.method) && !isWriteAllowedInReadOnly(req)) {
-                return res.status(403).json({
-                    message: "Account is in read-only mode due to unpaid invoice. Please pay to unlock.",
-                    billing: req.billing,
-                });
-            }
-
             const agency = await Agency.findById(agencyId).select("billingOverrideUnlocked billingOverrideUntil").lean();
 
             const overrideOk =
@@ -75,6 +67,14 @@ export function billingGuard() {
             if (overrideOk) {
                 req.billing = { status: "ok", override: true };
                 return next();
+            }
+
+            // Block writes in read-only window unless it's an allowed billing endpoint
+            if (readOnly && WRITE_METHODS.has(req.method) && !isWriteAllowedInReadOnly(req)) {
+                return res.status(403).json({
+                    message: "Account is in read-only mode due to unpaid invoice. Please pay to unlock.",
+                    billing: req.billing,
+                });
             }
 
             return next();

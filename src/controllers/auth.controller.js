@@ -276,9 +276,12 @@ export async function verifyOtp(req, res, next) {
     }
 
     otpRecord.verified = true;
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    otpRecord.resetToken = resetToken;
+    otpRecord.resetTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
     await otpRecord.save();
 
-    res.json({ message: 'OTP verified successfully', userId: user._id });
+    res.json({ message: 'OTP verified successfully', userId: user._id, resetToken });
   } catch (err) {
     next(err);
   }
@@ -288,29 +291,34 @@ export async function verifyOtp(req, res, next) {
 // 3️⃣ Reset password
 export async function resetPassword(req, res, next) {
   try {
-    const { userId, newPassword } = req.body;
+    const { userId, resetToken, newPassword } = req.body;
 
-    // Validate inputs
-    if (!userId || !newPassword) {
-      return res.status(400).json({ message: "userId and newPassword are required" });
+    if (!userId || !resetToken || !newPassword) {
+      return res.status(400).json({ message: "userId, resetToken, and newPassword are required" });
     }
 
-    // 1️⃣ Find the user
+    const otpRecord = await Otp.findOne({
+      user: userId,
+      resetToken,
+      resetTokenExpiresAt: { $gt: new Date() },
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({ message: "Invalid or expired reset token" });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 2️⃣ Update password
     user.password = newPassword; // hashing handled by pre-save hook in User model
     await user.save();
 
-    // 3️⃣ Clean up OTPs for this user
     await Otp.deleteMany({ user: user._id });
 
     console.log(`🔑 Password reset successful for ${user.email}`);
 
-    // 4️⃣ Respond
     res.json({ message: "Password reset successful" });
   } catch (err) {
     console.error("resetPassword error:", err);
