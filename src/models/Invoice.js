@@ -10,6 +10,7 @@ const invoiceSchema = new mongoose.Schema(
     currency: { type: String, default: "USD" },
 
     amount: { type: Number, required: true }, // recordsBilled * unitPrice
+    breakdown: { type: mongoose.Schema.Types.Mixed, default: undefined },
     status: { type: String, enum: ["unpaid", "paid", "void"], default: "unpaid", index: true },
 
     issuedAt: { type: Date, required: true },

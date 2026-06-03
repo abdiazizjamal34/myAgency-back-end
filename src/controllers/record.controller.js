@@ -1,7 +1,7 @@
 import Record from '../models/Record.js';
 import { ROLES } from '../utils/constants.js';
 import { validationResult } from 'express-validator';
-import { incrementRecordUsage } from "../services/usage.service.js";
+import { incrementRecordUsage, decrementRecordUsage } from "../services/usage.service.js";
 
 
 
@@ -158,6 +158,7 @@ export async function deleteRecord(req, res, next) {
     const record = await Record.findOne(query);
     if (!record) return res.status(404).json({ message: 'Record not found' });
     await record.deleteOne();
+    await decrementRecordUsage({ agencyId: record.agency, at: record.createdAt });
     res.json({ message: 'Record deleted' });
   } catch (err) { next(err); }
 }
