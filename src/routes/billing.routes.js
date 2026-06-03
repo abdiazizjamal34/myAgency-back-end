@@ -129,40 +129,6 @@ router.get("/payment-requests", async (req, res, next) => {
 });
 
 
-// Billing overview: usage + estimated bill this month
-// router.get("/overview", async (req, res, next) => {
-//     try {
-//         const agencyId = req.user.agency;
-//         const now = new Date();
-//         const periodKey = getPeriodKey(now);
-
-//         const agency = await Agency.findById(agencyId, { billingPlan: 1 }).lean();
-//         const plan = agency?.billingPlan
-//             ? await Plan.findById(agency.billingPlan).lean()
-//             : await Plan.findOne({ name: "LEVEL_1" }).lean();
-
-//         const usage = await Usage.findOne({ agencyId, periodKey }).lean();
-//         const used = usage?.recordsCreated || 0;
-
-//         const included = plan.includedRecords;
-//         const overage = Math.max(0, used - included);
-//         const estimate = plan.monthlyFee + overage * plan.overagePrice;
-
-//         const unpaid = await Invoice.findOne({ agencyId, status: "unpaid" }).sort({ issuedAt: -1 }).lean();
-
-//         res.json({
-//             plan,
-//             period: { periodKey, start: getMonthStart(now), end: getMonthEnd(now) },
-//             usage: { used, included, overage, overagePrice: plan.overagePrice },
-//             estimate: { amount: estimate, currency: plan.currency || "ETB" },
-//             unpaidInvoice: unpaid || null,
-//             billing: req.billing || { status: "ok" },
-//         });
-//     } catch (e) { next(e); }
-// });
-
-
-
 
 
 router.get("/overview", async (req, res, next) => {
@@ -280,42 +246,6 @@ router.get("/debug-usage", async (req, res, next) => {
 });
 
                 
-// List invoices
-
-// router.post("/test-generate", async (req, res, next) => {
-//     try {
-//         let agencyId = req.user?.agency;
-
-//         // ✅ SUPER_ADMIN can pass ?agencyId=
-//         if (req.user?.role === ROLES.SUPER_ADMIN && req.query.agencyId) {
-//             agencyId = req.query.agencyId;
-//         }
-
-//         if (!agencyId) {
-//             return res.status(400).json({ message: "agencyId is required (or login as agency user)" });
-//         }
-
-//         const usage = await Usage.findOne({ agencyId }).sort({ createdAt: -1 });
-//         if (!usage) return res.json({ message: "No usage found" });
-
-//         const invoice = await Invoice.create({
-//             agencyId,
-//             periodKey: usage.periodKey,
-//             recordsBilled: usage.recordsCreated,
-//             unitPrice: 0.02,
-//             currency: "USD",
-//             amount: Number((usage.recordsCreated * 0.02).toFixed(2)),
-//             status: "unpaid",
-//             issuedAt: new Date(),
-//             dueAt: new Date(new Date().getFullYear(), new Date().getMonth(), 16, 23, 59, 59, 999),
-//         });
-
-//         return res.json({ invoice });
-//     } catch (err) {
-//         next(err);
-//     }
-// });
-
 
 router.post("/test-generate", requireRole(ROLES.SUPER_ADMIN), async (req, res, next) => {
     try {

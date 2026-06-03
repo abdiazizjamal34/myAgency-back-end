@@ -21,3 +21,15 @@ export async function incrementRecordUsage({ agencyId, at = new Date() }) {
 
     return update;
 }
+
+export async function decrementRecordUsage({ agencyId, at = new Date() }) {
+    const periodKey = getPeriodKey(at);
+
+    const update = await Usage.findOneAndUpdate(
+        { agencyId, periodKey, locked: { $ne: true }, recordsCreated: { $gt: 0 } },
+        { $inc: { recordsCreated: -1 } },
+        { new: true }
+    );
+
+    return update;
+}
