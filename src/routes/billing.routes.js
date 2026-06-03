@@ -5,6 +5,7 @@ import Agency from "../models/Agency.js";
 import { getPeriodKey, getMonthStart, getMonthEnd, previousMonthKey, dueDateForCurrentMonth } from "../utils/billingPeriod.js";
 import Plan from "../models/Plan.js";
 import { ROLES } from "../utils/constants.js";
+import { requireRole } from "../middleware/roles.js";
 import PaymentRequest from "../models/PaymentRequest.js";
 import { uploadReceipt } from "../middleware/uploadReceipt.js";
 
@@ -316,7 +317,7 @@ router.get("/debug-usage", async (req, res, next) => {
 // });
 
 
-router.post("/test-generate", async (req, res, next) => {
+router.post("/test-generate", requireRole(ROLES.SUPER_ADMIN), async (req, res, next) => {
     try {
         let agencyId = req.user.agency;
 

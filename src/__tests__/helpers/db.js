@@ -6,6 +6,7 @@ let mongod;
 export async function dbConnect() {
   mongod = await MongoMemoryServer.create();
   await mongoose.connect(mongod.getUri());
+  await mongoose.connection.syncIndexes();
 }
 
 export async function dbDisconnect() {

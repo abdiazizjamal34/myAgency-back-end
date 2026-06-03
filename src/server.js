@@ -11,7 +11,6 @@ import userRoutes from './routes/user.routes.js';
 import recordRoutes from './routes/record.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import errorHandler from './utils/errorHandler.js';
-import path from 'path';
 import notificationRoutes from './routes/notification.routes.js';
 import agencyTicketRoutes from './routes/agencyTicket.routes.js'
 import ticketTemplatesRoutes from './routes/ticketTemplates.routes.js'
@@ -24,6 +23,7 @@ import { startBillingCron } from "./jobs/billing.cron.js";
 
 import { auth as authMiddleware } from "./middleware/auth.js";
 import { billingGuard } from "./middleware/billingGuard.js";
+import filesRoutes from "./routes/files.routes.js";
 
 dotenv.config();
 const app = express();
@@ -63,9 +63,6 @@ app.use('/api/auth/forgot-password', otpRateLimit);
 app.use('/api/auth/resend-verification-email', otpRateLimit);
 app.use('/api/auth', authRoutes);
 
-// Static
-app.use('/uploads', express.static(path.resolve('uploads')));
-
 // ✅ 2) AUTH (sets req.user)
 app.use(authMiddleware);
 
@@ -73,6 +70,7 @@ app.use(authMiddleware);
 app.use(billingGuard());
 
 // ✅ 4) PROTECTED ROUTES (everything below is now subject to billing rules)
+app.use('/api/files', filesRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/admin/billing', adminBillingRoutes);
 app.use("/api/admin/billing", adminAgencyBillingRoutes);
