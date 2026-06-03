@@ -132,7 +132,7 @@ export const reprocessTicket = async (req, res) => {
 
 export const manualUpdateTicket = async (req, res) => {
   try {
-    const agencyId = req.user.agencyId;
+    const agencyId = req.user.agency;
     const { id } = req.params;
 
     const ticket = await TicketDocument.findOne({ _id: id, agencyId });
