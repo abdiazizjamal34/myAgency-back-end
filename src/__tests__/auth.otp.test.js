@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
+import crypto from 'crypto';
 import { dbConnect, dbDisconnect, dbClear } from './helpers/db.js';
 
 vi.mock('../utils/mailer.js', () => ({
@@ -56,6 +57,7 @@ describe('verifyOtp', () => {
     await Otp.create({
       user: user._id,
       code: '654321',
+      purpose: 'password_reset',
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       verified: false,
       ...overrides,
@@ -76,7 +78,8 @@ describe('verifyOtp', () => {
 
     const updated = await Otp.findOne({ user: user._id });
     expect(updated.verified).toBe(true);
-    expect(updated.resetToken).toBe(payload.resetToken);
+    // DB stores SHA-256 hash of the raw token returned to client
+    expect(updated.resetToken).toBe(crypto.createHash('sha256').update(payload.resetToken).digest('hex'));
     expect(updated.resetTokenExpiresAt).toBeInstanceOf(Date);
   });
 
@@ -100,6 +103,14 @@ describe('verifyOtp', () => {
     await verifyOtp(req, res, vi.fn());
     expect(res.status).toHaveBeenCalledWith(400);
   });
+
+  it('rejects an email_verification OTP used for password reset', async () => {
+    const user = await seedOtp({ purpose: 'email_verification' });
+    const { req, res } = makeCtx({ identifier: user.email, code: '654321' });
+    await verifyOtp(req, res, vi.fn());
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('Invalid') }));
+  });
 });
 
 // ─── resetPassword ───────────────────────────────────────────────────────────
@@ -107,17 +118,20 @@ describe('verifyOtp', () => {
 describe('resetPassword', () => {
   async function seedWithToken(tokenOverrides = {}) {
     const user = await User.create({ name: 'C', email: 'c@test.com', phone: '+3000', password: 'oldpass' });
-    const resetToken = 'a'.repeat(64);
+    // Raw token is what the client sends; DB must store its SHA-256 hash (mirrors controller behaviour)
+    const rawToken = 'a'.repeat(64);
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
     await Otp.create({
       user: user._id,
       code: '000000',
+      purpose: 'password_reset',
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       verified: true,
-      resetToken,
+      resetToken: hashedToken,
       resetTokenExpiresAt: new Date(Date.now() + 15 * 60 * 1000),
       ...tokenOverrides,
     });
-    return { user, resetToken };
+    return { user, resetToken: rawToken };
   }
 
   it('returns 400 when resetToken is absent', async () => {

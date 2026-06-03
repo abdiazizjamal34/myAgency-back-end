@@ -223,6 +223,7 @@ export async function requestOtp(req, res, next) {
       user: user._id,
       code,
       type: method === 'email' ? 'email' : (method === 'whatsapp' ? 'whatsapp' : 'sms'),
+      purpose: 'password_reset',
       expiresAt,
       verified: false
     });
@@ -266,6 +267,7 @@ export async function verifyOtp(req, res, next) {
     const otpRecord = await Otp.findOne({
       user: user._id,
       code: providedCode,
+      purpose: 'password_reset',
       verified: false,
       expiresAt: { $gt: new Date() },
     });
@@ -363,6 +365,7 @@ export async function verifyEmail(req, res, next) {
       user: user._id,
       code: provided,
       type: 'email',
+      purpose: 'email_verification',
       verified: false,
       expiresAt: { $gt: new Date() }
     });

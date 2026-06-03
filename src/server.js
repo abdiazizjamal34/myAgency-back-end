@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 import connectDB from './utils/db.js';
 import authRoutes from './routes/auth.routes.js';
 import agencyRoutes from './routes/agency.routes.js';
@@ -27,16 +28,39 @@ import { billingGuard } from "./middleware/billingGuard.js";
 dotenv.config();
 const app = express();
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : [];
+
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow same-origin / server-to-server requests (no Origin header)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(Object.assign(new Error('Not allowed by CORS'), { status: 403 }));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(morgan('dev'));
+
+const otpRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many OTP requests, please try again after 15 minutes' },
+});
 
 app.get('/', (req, res) => {
   res.json({ status: 'ok', name: 'agency-finance-backend', version: '1.0.0' });
 });
 
 // ✅ 1) PUBLIC ROUTES (no auth, no billing)
+// Rate-limit OTP-generation endpoints: 5 requests per IP per 15 min
+app.use('/api/auth/forgot-password', otpRateLimit);
+app.use('/api/auth/resend-verification-email', otpRateLimit);
 app.use('/api/auth', authRoutes);
 
 // Static
