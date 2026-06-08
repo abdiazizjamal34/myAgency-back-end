@@ -16,7 +16,8 @@ const TicketTemplateSchema = new mongoose.Schema(
       phone: { type: String, default: "" },
       email: { type: String, default: "" },
       address: { type: String, default: "" },
-      logoUrl: { type: String, default: "" }, // e.g: /uploads/agencies/xxx.png
+      website: { type: String, default: "" },
+      logoUrl: { type: String, default: "" },
     },
 
     theme: {
@@ -27,6 +28,28 @@ const TicketTemplateSchema = new mongoose.Schema(
       paper: { type: String, enum: ["A4", "LETTER"], default: "A4" },
     },
 
+    // Used by the frontend TicketTemplateDesigner and TicketRenderer
+    sections: {
+      showHeader: { type: Boolean, default: true },
+      showPassengerList: { type: Boolean, default: true },
+      showItinerary: { type: Boolean, default: true },
+      showBaggage: { type: Boolean, default: true },
+      showNotes: { type: Boolean, default: true },
+      showStatus: { type: Boolean, default: true },
+      showAgencyContact: { type: Boolean, default: true },
+      showFooter: { type: Boolean, default: true },
+    },
+
+    labels: {
+      passengerTitle: { type: String, default: "Passenger Information" },
+      itineraryTitle: { type: String, default: "Flight Itinerary" },
+      notesTitle: { type: String, default: "Important Notes" },
+      baggageTitle: { type: String, default: "Baggage" },
+      statusTitle: { type: String, default: "Status" },
+      agencyTitle: { type: String, default: "Agency" },
+    },
+
+    // Used by the server-side PDF renderer (ticketRenderHtml.service.js)
     show: {
       showAgencyHeader: { type: Boolean, default: true },
       showPassengerList: { type: Boolean, default: true },
