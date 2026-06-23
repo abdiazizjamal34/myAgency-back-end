@@ -32,37 +32,9 @@ jobs:
           node --check src/server.js
           for f in src/**/*.js; do node --check "$f"; done
 
-  # ─── CD (only on push to main) ─────────────────────────────────────────────
-  deploy:
-    name: Deploy to EC2
-    needs: ci
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          script: |
-            set -e
-            cd ${{ secrets.EC2_APP_DIR }}
-
-            echo "→ Pulling latest code..."
-            git pull origin main
-
-            echo "→ Installing production dependencies..."
-            PUPPETEER_SKIP_DOWNLOAD=true npm ci --omit=dev
-
-            echo "→ Restarting app with PM2..."
-            pm2 restart agency-backend --update-env || \
-              pm2 start src/server.js \
-                --name agency-backend \
-                --interpreter node \
-                --watch false
-
-            pm2 save
-            echo "✅ Deploy complete"
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-test-secret-not-real
+          JWT_EXPIRES_IN: 7d
